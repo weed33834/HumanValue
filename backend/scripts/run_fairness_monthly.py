@@ -245,8 +245,11 @@ def generate_monthly_report(
     生成完整月报 dict。records 为空时调用造数函数生成 weeks 周数据。
 
     返回结构包含：周次、各维度分组统计、4 周趋势、双线汇报专项、整体指标。
+    data_source 字段标记数据来源("real"=外部传入 / "synthetic"=内置造数),
+    渲染层据此决定是否展示合成数据警示横幅。
     """
-    if records is None or not records:
+    synthetic = records is None or not records
+    if synthetic:
         records = generate_pilot_evaluations(weeks=weeks)
 
     week_labels = sorted({r["period"] for r in records if r.get("period")})
@@ -269,6 +272,7 @@ def generate_monthly_report(
 
     return {
         "generated_at": datetime.now(timezone.utc).isoformat(),
+        "data_source": "synthetic" if synthetic else "real",
         "weeks": week_labels,
         "dimensions": DIMENSIONS,
         "total_evaluations": len(records),
@@ -297,6 +301,13 @@ def render_markdown(report: dict) -> str:
     lines: list[str] = []
     lines.append("# HumanValue 公平性审计月报")
     lines.append("")
+    if report.get("data_source") == "synthetic":
+        lines.append("> ⚠️ **数据来源：内置合成数据（演示/联调用）。**")
+        lines.append(
+            "> 本报告全部结论基于脚本造数,不代表任何真实组织;生产使用请通过"
+            " `--input <records.json>` 传入真实评估记录。"
+        )
+        lines.append("")
     lines.append(f"> 生成时间：{report['generated_at']}")
     lines.append(f"> 覆盖周次：{', '.join(report['weeks'])}")
     lines.append(f"> 评估总样本数：{report['total_evaluations']} 条")
@@ -461,6 +472,11 @@ def main(argv: list[str] | None = None) -> int:
         help="markdown 摘要输出目录，默认 <repo>/docs/",
     )
     parser.add_argument(
+        "--input",
+        default=None,
+        help="真实评估记录 JSON 数组路径;缺省时使用内置合成数据(报告将标注 SYNTHETIC)",
+    )
+    parser.add_argument(
         "--seed",
         type=int,
         default=20260615,
@@ -468,8 +484,16 @@ def main(argv: list[str] | None = None) -> int:
     )
     args = parser.parse_args(argv)
 
-    records = generate_pilot_evaluations(weeks=args.weeks, seed=args.seed)
-    report = generate_monthly_report(records=records, weeks=args.weeks)
+    if args.input:
+        input_path = Path(args.input)
+        if not input_path.exists():
+            print(f"输入文件不存在: {input_path}")
+            return 2
+        records = json.loads(input_path.read_text(encoding="utf-8"))
+        report = generate_monthly_report(records=records, weeks=args.weeks)
+    else:
+        records = generate_pilot_evaluations(weeks=args.weeks, seed=args.seed)
+        report = generate_monthly_report(records=records, weeks=args.weeks)
 
     output_dir = Path(args.output)
     output_dir.mkdir(parents=True, exist_ok=True)
@@ -486,6 +510,8 @@ def main(argv: list[str] | None = None) -> int:
     print(f"Markdown 月报已写入: {md_path}")
 
     # 控制台简要摘要
+    if report.get("data_source") == "synthetic":
+        print("⚠️ 当前使用内置合成数据,结论仅用于演示/联调;真实审计请 --input 传入记录")
     print(f"\n评估总样本: {report['total_evaluations']}")
     for dim in report["dimensions"]:
         s = report["by_dimension"][dim]

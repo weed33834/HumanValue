@@ -213,6 +213,29 @@ def schedule_restore_test(
     """
     from core.scheduler import register_system_task
 
+    async def _notify_restore_failure() -> None:
+        """恢复验证失败时落告警并尝试外发通知(尽力而为,失败不影响主流程)"""
+        try:
+            from core.database import AsyncSessionLocal
+            from services.alert_service import AlertService
+
+            async with AsyncSessionLocal() as session:
+                svc = AlertService(session)
+                alert = await svc.create_alert(
+                    severity="critical",
+                    title="数据库备份恢复验证失败",
+                    message=(
+                        "定期恢复验证未通过,备份文件可能不可用,"
+                        "请立即检查 BACKUP_DIR 与备份流程"
+                    ),
+                    source="system",
+                    metadata={"task": "db_restore_verify"},
+                )
+                await svc.send_alert(alert)
+                await session.commit()
+        except Exception:
+            logger.error("恢复验证失败的告警发送异常", exc_info=True)
+
     async def _run_restore_verification():
         """执行恢复验证(异步包装)"""
         try:
@@ -231,7 +254,7 @@ def schedule_restore_test(
                 logger.info("✅ 定期备份恢复验证通过")
             else:
                 logger.error("❌ 定期备份恢复验证失败,请检查备份文件完整性")
-                # TODO: 可通过 alert_service 发送告警通知
+                await _notify_restore_failure()
         except Exception as e:
             logger.error("备份恢复验证异常: %s", e, exc_info=True)
 
