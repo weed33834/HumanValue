@@ -1,0 +1,203 @@
+# 基础 CI: 代码检查 + 测试 + 构建
+# 仅在 PR 和 push 到 main 时触发, 不自动合并、不自动开分支
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # ────────────────── Python 后端 ──────────────────
+  backend-lint:
+    name: Backend Lint (ruff + black)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install ruff==0.13.2 black==25.1.0
+      - name: Ruff check
+        working-directory: backend
+        run: ruff check .
+      - name: Black format check
+        working-directory: backend
+        run: black --check .
+      - name: Quality gate (route signatures / syntax / deps / field key)
+        working-directory: backend
+        run: python scripts/check_backend_quality.py
+
+  backend-test:
+    name: Backend Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Install dependencies
+        working-directory: backend
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest pytest-asyncio pytest-cov
+      - name: Run tests with coverage
+        working-directory: backend
+        env:
+          AUTH_DEMO_MODE: "true"
+          JWT_SECRET_KEY: ci-test-secret-key-not-for-production
+        run: |
+          python -m pytest -x -q --tb=short \
+            --cov=. --cov-report=term-missing --cov-report=xml \
+            --cov-fail-under=50 \
+            --ignore=tests/perf
+
+  # P1-4: 数据库迁移往返测试(upgrade → downgrade → upgrade)
+  backend-migration-test:
+    name: Backend Migration Round-trip
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Install dependencies
+        working-directory: backend
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install alembic aiosqlite
+      - name: Test migration round-trip
+        working-directory: backend
+        env:
+          DATABASE_URL: "sqlite+aiosqlite:///./migration_test.db"
+          AUTH_DEMO_MODE: "true"
+          JWT_SECRET_KEY: ci-test-secret-key-not-for-production
+        run: |
+          # 1. upgrade head
+          alembic upgrade head
+          # 2. downgrade -1 (回退一个版本)
+          alembic downgrade -1
+          # 3. upgrade head again (验证可重新升级)
+          alembic upgrade head
+          # 4. downgrade base (回退到初始状态)
+          alembic downgrade base
+          # 5. upgrade head (从零开始完整升级)
+          alembic upgrade head
+          echo "✅ Migration round-trip test passed"
+      - name: Cleanup
+        working-directory: backend
+        run: rm -f migration_test.db
+
+  # WS-2: Prompt 变更门禁(回归对比)。有 LLM_API_KEY 时跑真实模型，否则退化为 --mock 冒烟。
+  # continue-on-error: LLM 输出存在抖动，门禁只作为 PR 上的信号而非硬阻塞。
+  backend-eval-gate:
+    name: Backend Eval Regression Gate
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Install dependencies
+        working-directory: backend
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt
+      - name: Run prompt regression gate (current vs v1.0)
+        working-directory: backend
+        env:
+          AUTH_DEMO_MODE: "true"
+          JWT_SECRET_KEY: ci-test-secret-key-not-for-production
+          LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: |
+          # 无密钥时用 Mock Provider 跑通流程，保证门禁脚本本身不腐烂
+          if [ -z "$LLM_API_KEY" ] && [ -z "$OPENAI_API_KEY" ]; then
+            echo "::notice::未配置 LLM 密钥，回退到 --mock 冒烟模式"
+            MOCK_FLAG="--mock"
+          else
+            MOCK_FLAG=""
+          fi
+          python -m eval.evaluate \
+            --compare v1.0 \
+            --output eval-regression-report.json \
+            $MOCK_FLAG
+      - name: Upload regression report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: eval-regression-report
+          path: backend/eval-regression-report.json
+          if-no-files-found: warn
+
+  # ────────────────── 前端 ──────────────────
+  frontend-lint:
+    name: Frontend Lint (eslint + prettier)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: Install dependencies
+        working-directory: frontend
+        run: npm ci
+      - name: ESLint
+        working-directory: frontend
+        run: npm run lint
+      - name: Prettier format check
+        working-directory: frontend
+        run: npm run format:check
+
+  frontend-build:
+    name: Frontend Build
+    runs-on: ubuntu-latest
+    needs: frontend-lint
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: Install dependencies
+        working-directory: frontend
+        run: npm ci
+      - name: Build
+        working-directory: frontend
+        run: npm run build
+
+  frontend-test:
+    name: Frontend Tests
+    runs-on: ubuntu-latest
+    needs: frontend-lint
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: Install dependencies
+        working-directory: frontend
+        run: npm ci
+      - name: Run tests
+        working-directory: frontend
+        run: npm run test

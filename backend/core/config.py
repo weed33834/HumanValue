@@ -1,0 +1,425 @@
+"""
+HumanValue 应用配置
+优先从环境变量读取，本地开发可使用 .env 文件。
+"""
+
+from functools import lru_cache
+from dataclasses import dataclass
+from typing import Literal, Optional
+
+from pydantic import model_validator
+from pydantic_settings import BaseSettings, SettingsConfigDict
+
+
+class Settings(BaseSettings):
+    """应用配置"""
+
+    model_config = SettingsConfigDict(
+        # .env.runtime 由 admin LLM 配置 API 写入（gitignored），优先级高于 .env
+        env_file=(".env", ".env.runtime"),
+        env_file_encoding="utf-8",
+        extra="ignore",
+    )
+
+    app_name: str = "HumanValue"
+    debug: bool = False
+
+    # 数据库：默认 SQLite（异步），生产可改为 postgresql+asyncpg://...
+    database_url: str = "sqlite+aiosqlite:///./humanvalue.db"
+    # P0-3: 数据库连接池调优（仅 PostgreSQL 生效，SQLite 使用 NullPool）
+    db_pool_size: int = 20
+    db_max_overflow: int = 10
+    db_pool_recycle: int = 3600  # 秒，防止长连接被数据库断开
+    db_pool_pre_ping: bool = True  # 连接前检测存活，避免使用已断开的连接
+
+    # 任务队列 Redis：配置后启用 RedisJobQueue,多实例共享异步评估任务状态
+    # 留空则降级为 InMemoryJobQueue(单实例,测试与本地开发默认)
+    redis_url: Optional[str] = None
+
+    # P3 规模化就绪:是否启用 arq 任务队列 + 自动重投 + 死信队列
+    # 未启用时降级到 RedisJobQueue(裸 redis.asyncio 共享存储,无 worker 进程)
+    # 启用时需另行启动 arq worker: `arq core.arq_worker.WorkerSettings`
+    use_arq_queue: bool = False
+    # arq worker 重投次数(不含首次),到顶后入死信队列
+    arq_max_tries: int = 3
+    # arq 任务超时(秒),超时 worker 取消并触发重投(最后一次后入死信)
+    arq_job_timeout: float = 600.0
+
+    # P3 规模化就绪:LangGraph checkpointer 持久化
+    # 未设置时降级到 MemorySaver(单实例限制,见 H3)
+    # 启用时使用 Postgres checkpointer,DATABASE_URL 必须是 postgresql://
+    use_postgres_checkpointer: bool = False
+
+    # 模型档位强制设定，可选 auto / L0 / L1 / L2 / L3
+    model_tier: Literal["auto", "L0", "L1", "L2", "L3"] = "auto"
+
+    # 通用云端 API 配置（OpenAI 兼容，可用于 DeepSeek / 阿里云百炼 / 硅基流动等）
+    cloud_api_key: Optional[str] = None
+    cloud_base_url: str = "https://api.openai.com/v1"
+    cloud_model: str = "gpt-4o-mini"
+
+    # 兼容旧版 OpenAI 命名（未设置 cloud_* 时兜底使用）
+    openai_api_key: Optional[str] = None
+    openai_base_url: str = "https://api.openai.com/v1"
+    openai_model: str = "gpt-4o-mini"
+
+    # 本地 LM Studio / Ollama 配置（OpenAI 兼容接口）
+    local_base_url: str = "http://localhost:1234/v1"
+    local_api_key: Optional[str] = None
+    local_model_l1: str = "qwen2.5-0.5b-instruct"
+    local_model_l2: str = "qwen2.5-7b-instruct"
+    local_model_l3: str = "qwen2.5-14b-instruct"
+
+    # Embedding 配置（OpenAI 兼容接口）
+    embedding_api_key: Optional[str] = None
+    embedding_base_url: Optional[str] = None
+    embedding_model: str = "text-embedding-3-small"
+    embedding_dimensions: int = 1536
+
+    # 向量库配置
+    vector_store_dir: str = "./chroma_db"
+
+    # 知识库分块配置(P1-1 知识库管理 UI)
+    # chunk_size: 单块字符数,后续 reindex 按此切分长文档
+    # chunk_overlap: 相邻块字符重叠,提升跨块语义连续性
+    chunk_size: int = 800
+    chunk_overlap: int = 100
+
+    # 附件存储目录（路径遍历防护白名单根目录）
+    attachment_dir: str = "./attachments"
+
+    # 多模态抽取配置(Phase 7.1 + Phase 10 真实接入)
+    # OCR 后端: none(默认不启用) / tesseract / cloud
+    ocr_provider: str = "none"
+    ocr_lang: str = "chi_sim+eng"
+    ocr_cloud_provider: str = "aliyun"  # aliyun / baidu(legacy,保留兼容)
+    ocr_cloud_secret_key: Optional[str] = None
+    # ASR 后端: dummy(默认占位) / whisper
+    asr_provider: str = "dummy"
+    whisper_model: str = "base"
+    # OCR/ASR 置信度阈值: 低于该值标记需人工复核
+    multimodal_confidence_threshold: float = 0.7
+
+    # 云端 OCR 配置(Phase 10 多模态真实接入)
+    # ocr_provider == "cloud" 时生效,基于 OpenAI 兼容 vision API
+    ocr_cloud_api_key: Optional[str] = None
+    ocr_cloud_base_url: Optional[str] = "https://api.openai.com/v1"
+    ocr_cloud_model: str = "gpt-4o-mini"
+
+    # 云端 ASR 配置(Phase 10 多模态真实接入)
+    # asr_provider == "whisper" 时生效,基于 OpenAI 兼容 audio transcription API
+    asr_cloud_api_key: Optional[str] = None
+    asr_cloud_base_url: Optional[str] = "https://api.openai.com/v1"
+    asr_cloud_model: str = "whisper-1"
+
+    # S3 兼容对象存储(MinIO)：配置 s3_endpoint 后附件走对象存储，未配置降级到本地目录
+    s3_endpoint: Optional[str] = None
+    s3_access_key: Optional[str] = None
+    s3_secret_key: Optional[str] = None
+    s3_bucket: str = "humanvalue-attachments"
+    s3_secure: bool = True
+
+    # 默认推理参数
+    temperature: float = 0.1
+    max_tokens: int = 4096
+    # LLM 单次请求超时（秒）：评估类请求 prompt 较长，免费/自托管服务响应较慢时需调大
+    llm_request_timeout: float = 120.0
+    # M18/M23 鲁棒性: 流式空闲超时(秒)。超过该时长未收到新 chunk 视为上游挂起, 终止流式并告警,
+    # 避免聊天/评估在慢/卡的上游(如部分聚合通道)上无限阻塞。
+    llm_stream_idle_timeout: float = 90.0
+
+    # Langfuse 可观测性配置
+    langfuse_public_key: Optional[str] = None
+    langfuse_secret_key: Optional[str] = None
+    langfuse_host: str = "https://cloud.langfuse.com"
+
+    # P1 工具管理: MCP 服务器配置 (JSON 字符串,参考 langchain-mcp-adapters MultiServerMCPClient)
+    # 示例: {"jira":{"transport":"streamable_http","url":"http://localhost:8001/mcp"},
+    #        "fs":{"transport":"stdio","command":"npx","args":["-y","@modelcontextprotocol/server-filesystem","./data"]}}
+    mcp_servers: Optional[str] = None
+    # 启用的内置工具(逗号分隔),缺省全部启用。
+    # 可选: employee_history,company_kb,calculator,datetime
+    enabled_tools: Optional[str] = None
+    # ReAct Agent 最大迭代次数(防止死循环)
+    react_agent_max_iterations: int = 10
+
+    # JWT 认证配置：生产环境必须通过环境变量设置强随机密钥
+    jwt_secret_key: Optional[str] = None
+    jwt_algorithm: str = "HS256"
+    jwt_expire_minutes: int = 1440  # 24 小时
+    # 演示模式：开启时允许通过 x-user-role / x-user-id header 伪造身份（仅开发/测试用）
+    auth_demo_mode: bool = False
+    # 演示模式默认密码 (仅 auth_demo_mode=True 时使用, 生产环境必须修改)
+    demo_default_password: str = "agentvalue123"
+
+    # ====== M14 企业治理：登录风控 (C.6) ======
+    login_lock_threshold: int = 5
+    login_lock_minutes: int = 15
+    login_ip_lock_threshold: int = 0
+    # ====== M14 企业治理：MFA 双因子 (C.3) ======
+    mfa_enforce_admin: bool = False
+    mfa_secret_key: Optional[str] = None
+
+    # ====== M23 性能工程：LLM 响应缓存 ======
+    llm_cache_enabled: bool = False
+    llm_cache_ttl: int = 600
+    llm_cache_max_size: int = 1000
+    llm_cache_similarity_threshold: float = 0.95
+
+    # ====== M29 容灾与业务连续性 ======
+    backup_dir: str = "./backups"
+    backup_retention_days: int = 30
+    backup_verify_enabled: bool = True
+    dr_rto_target_seconds: int = 300
+    dr_rpo_target_seconds: int = 300
+
+    # ====== 人才体系类型 (决定分析框架) ======
+    # enterprise_elimination 企业·淘汰制 | academic_cultivation 高校·培养制 |
+    # public_promotion 事业单位·职级晋升制 | training_certification 培训·技能认证制 |
+    # platform_gig 平台·灵活用工制
+    talent_system_type: str = "enterprise_elimination"
+
+    # ====== 对话控制台: 是否允许 Agent 通过对话调用业务服务 (控制工具) ======
+    control_tools_enabled: bool = True
+
+    # ====== 上下文压缩 (通用智能体能力): 会话历史 token 预算 ======
+    # 超限时折叠更早历史, 避免长对话超出模型上下文窗口
+    llm_context_token_budget: int = 6000
+
+    # 运行环境标识：仅当值为 "production" 时启用生产安全校验；
+    # 不设或非 production 时不做任何校验，确保开发与测试环境不受影响。
+    agentvalue_env: Optional[str] = None
+
+    # 数据留存策略（Phase 9.3）：GDPR/个保法要求原始输入 2 年、评估 5 年，
+    # 到期先归档缓冲 30 天再删除，避免误删与申诉期数据缺失。
+    retention_raw_input_days: int = 730
+    retention_evaluation_days: int = 1825
+    retention_archive_buffer_days: int = 30
+
+    # 字段级加密(用于 DB 中 manager_view/audit 敏感字段),base64 编码的 32 字节密钥
+    # 未配置时降级为明文(仅开发模式可接受,生产必须配置)
+    # 生成方法: python -c "import base64,os; print(base64.b64encode(os.urandom(32)).decode())"
+    field_encryption_key: Optional[str] = None
+
+    # ===== KMS / Vault 集成 (H5: 消除密钥明文配置) =====
+    # field_encryption_backend: 字段加密后端选择
+    #   - "env"   : 传统模式,从 field_encryption_key 读取 (向后兼容,默认)
+    #   - "vault" : HashiCorp Vault Transit Engine + Envelope Encryption (推荐生产)
+    #   - "aws"   : AWS KMS Envelope Encryption (aioboto3,原生 async)
+    #   - "aliyun": 阿里云 KMS (国内合规)
+    #   - "local" : 本地 KMS 模拟 (开发/测试,等价 env)
+    field_encryption_backend: str = "env"
+
+    # Vault 配置 (field_encryption_backend=vault 时必填)
+    vault_addr: Optional[str] = None
+    # vault_auth_method: "token" | "approle" | "kubernetes"
+    vault_auth_method: str = "token"
+    vault_token: Optional[str] = None  # auth_method=token 时使用
+    vault_role_id: Optional[str] = None  # auth_method=approle 时使用
+    vault_secret_id: Optional[str] = None  # auth_method=approle 时使用
+    vault_k8s_role: Optional[str] = None  # auth_method=kubernetes 时使用
+    vault_namespace: Optional[str] = None
+    vault_kv_mount: str = "secret"  # KV v2 mount point
+    vault_transit_mount: str = "transit"  # Transit engine mount point
+    vault_field_kek_name: str = (
+        "humanvalue-field-kek"  # Transit key name for field encryption
+    )
+    vault_jwt_key_path: str = "agentvalue/jwt-signing-key"  # KV v2 path for JWT secret
+    vault_verify_tls: bool = True
+
+    # AWS KMS 配置 (field_encryption_backend=aws 时必填)
+    aws_kms_key_id: Optional[str] = None  # alias/agentvalue-field-kek 或 key ARN
+    aws_kms_region: Optional[str] = None  # 默认从环境推断
+
+    # 阿里云 KMS 配置 (field_encryption_backend=aliyun 时必填)
+    aliyun_kms_key_id: Optional[str] = None
+    aliyun_kms_endpoint: Optional[str] = None  # kms.<region>.aliyuncs.com
+
+    # DEK 缓存配置 (Envelope Encryption 性能关键)
+    # 参考 AWS Encryption SDK 安全阈值: max_age 必填, max_messages/max_bytes 限制单 DEK 用量
+    kms_dek_cache_ttl_seconds: int = 300  # 5 分钟,过期重新生成 DEK
+    kms_dek_cache_max_size: int = 1000  # LRU 容量上限
+    kms_dek_cache_max_messages: int = 100  # 单 DEK 最多加密 100 条消息
+    kms_dek_cache_max_bytes: int = 64 * 1024 * 1024  # 单 DEK 最多加密 64MB
+
+    # 护栏误报率统计开关
+    guard_rails_metrics_enabled: bool = True
+
+    # ===== P1-26: 高级 Prompt 注入检测 (可选增强, 向后兼容) =====
+    # 启用 AdvancedInjectionDetector (语义级 ML + 规则级 + 编码绕过 + 多语言)
+    # 关闭时仅使用基础 InputGuard 正则, 完全向后兼容
+    injection_detection_enabled: bool = True
+    # 语义级注入概率判定阈值 (0-1), ML 模型分数 >= 阈值视为注入
+    injection_detection_threshold: float = 0.8
+    # ML 模型名 (deepset/deberta-v3-base-injection)
+    # 需安装可选依赖 transformers + torch, 未安装时自动降级为仅规则检测
+    injection_model_name: str = "deepset/deberta-v3-base-injection"
+
+    # CORS 允许的源: 默认仅本地前端开发端口
+    # 生产部署需通过环境变量 CORS_ORIGINS 配置为前端实际域名(逗号分隔)
+    cors_origins: str = "http://localhost:5173,http://127.0.0.1:5173"
+
+    # JWT audience / issuer(P3-N4): 配置后 jwt.decode 做校验,防 token 跨服务复用
+    # 留空时不校验(向后兼容),生产建议配置
+    jwt_audience: Optional[str] = None
+    jwt_issuer: Optional[str] = None
+    # 时钟漂移容忍秒数(分布式部署多节点时钟未同步时避免误判过期)
+    jwt_leeway_seconds: int = 30
+
+    # Vision 模型配置(P1-2): ModelRouter 注入 Provider 时使用
+    vision_model: str = "gpt-4o-mini"
+
+    # /metrics 端点鉴权(P0 修复): 默认 "ip"(仅允许 127.0.0.1 + RFC1918 私网段),
+    # "token" 走 Bearer 校验(需配 METRICS_BEARER_TOKEN),"none" 关闭鉴权(仅本地开发)
+    metrics_auth_mode: str = "ip"
+    metrics_bearer_token: Optional[str] = None
+    # IP 白名单(逗号分隔 CIDR 或单 IP),仅 metrics_auth_mode=ip 时生效,
+    # 留空时仅放行 loopback + RFC1918(默认安全)
+    metrics_allowed_ips: Optional[str] = None
+
+    # P2-1: Prometheus 查询地址(供 admin/analytics 时序聚合使用)
+    # 默认本地 Prometheus,生产部署需通过环境变量 PROMETHEUS_URL 配置实际地址
+    prometheus_url: str = "http://localhost:9090"
+
+    # P2-2: Rerank Provider 抽象(对标 Dify Rerank)
+    # dummy(默认) / cohere / jina / bge
+    # 未配置或 dummy 时 retrieve_context 行为完全等价于未启用 rerank(向后兼容)
+    rerank_provider: str = "dummy"
+    rerank_api_key: Optional[str] = None
+    # 覆盖默认 endpoint(cohere: https://api.cohere.ai, jina: https://api.jina.ai)
+    rerank_base_url: Optional[str] = None
+    # 覆盖默认模型(cohere: rerank-multilingual-v3.0, jina: jina-reranker-v2-base-multilingual)
+    rerank_model: Optional[str] = None
+    # retrieve_context 默认 top_k(rerank 返回的文档数)
+    rerank_top_k: int = 5
+
+    # ------------------------------------------------------------- Mock LLM
+    # 开启后 ModelRouter 全档位返回确定性 MockProvider，无需任何模型凭证即可跑通
+    # 「创建评估 → LangGraph → 落库 → 双视图读取」全链路。
+    # 适用场景：售前 POC 演示、CI/E2E 流水线、内网隔离环境的流程验证。
+    # 生产环境强制禁止（见 _enforce_prod_demo_mode_guard），避免假数据被当作真实绩效结论。
+    llm_mock_mode: bool = False
+
+    # ------------------------------------------------- WS-1 原生 Trace 采集
+    # core/observe.py 的 trace 采样率（0.0~1.0）。1.0 = 全采集（默认）；
+    # 高 QPS 场景可调低以控制 trace_records/span_records 的写入量与存储成本。
+    # 采样在 trace 创建时判定，未命中的 trace 及其全部 span 都不落库。
+    trace_sample_rate: float = 1.0
+
+    # ------------------------------------------------- WS-4 企业级治理加固
+    # 租户查询守卫（core/tenant_guard.py）总开关
+    tenant_guard_enabled: bool = True
+    # 守卫模式：warn(默认，仅告警+打点) / enforce(抛异常) / off
+    # 上线流程：先 warn 跑一轮，把 agentvalue_tenant_guard_violations_total
+    # 压到 0 后再 TENANT_GUARD_MODE=enforce
+    tenant_guard_mode: str = "warn"
+
+    # 分布式限流（core/redis_rate_limit.py）总开关，关闭时沿用 slowapi 进程内限流
+    # 默认开启：REDIS_URL 未配置或 Redis 不可达时自动降级为 slowapi 进程内限流
+    redis_rate_limit_enabled: bool = True
+    # 四维令牌桶默认配额：capacity=桶容量(突发上限)，refill=每秒补充令牌数
+    rate_limit_tenant_capacity: int = 600
+    rate_limit_tenant_refill: float = 10.0
+    rate_limit_api_key_capacity: int = 300
+    rate_limit_api_key_refill: float = 5.0
+    rate_limit_user_capacity: int = 300
+    rate_limit_user_refill: float = 5.0
+    rate_limit_endpoint_capacity: int = 1200
+    rate_limit_endpoint_refill: float = 20.0
+    # 未单独配置的维度（或未来新增维度）的默认配额：每分钟请求数
+    # 换算规则：capacity=per_minute，refill=per_minute/60 每秒
+    redis_rate_limit_default_per_minute: int = 120
+    # Redis 故障降级告警的最小间隔（秒），避免每请求刷日志
+    rate_limit_degrade_log_interval: int = 60
+
+    # 代码沙箱资源限制（agent/code_interpreter.py，仅 POSIX 生效）
+    sandbox_rlimit_enabled: bool = True
+    # 地址空间上限(MB)：拦截 [0]*10**10 这类内存炸弹
+    sandbox_max_memory_mb: int = 512
+    # CPU 时间上限(秒)：拦截死循环（与 wall-clock timeout 互补）
+    sandbox_max_cpu_seconds: int = 10
+    # 最大打开文件数
+    sandbox_max_open_files: int = 64
+    # 单文件写入上限(MB)：拦截磁盘写爆
+    sandbox_max_file_size_mb: int = 16
+    # 最大进程/线程数：拦截 fork bomb
+    sandbox_max_processes: int = 32
+
+    @model_validator(mode="after")
+    def _enforce_prod_demo_mode_guard(self) -> "Settings":
+        """
+        生产环境守护：当处于生产环境（AGENTVALUE_ENV=production）且开启演示模式时，
+        直接禁止实例化，避免身份伪造能力泄漏到生产。
+
+        安全设计要点：
+        - 仅当 agentvalue_env == "production" 时才校验，其余情况（含默认 None）完全放行；
+        - 现有测试套件不设置 AGENTVALUE_ENV，且 conftest 通过 monkeypatch 在已实例化
+          对象上修改 auth_demo_mode（model_config 未开启 validate_assignment），
+          不会再次触发本校验器，故对现有测试零影响。
+        - 仅做 auth_demo_mode 硬失败(身份伪造 = 灾难级)；JWT/CORS/field_encryption_key
+          等其余生产检查由 scripts/check_prod_readiness.py 作为 advisory gatekeeper
+          返回 PASS/WARN/FAIL,分层设计避免本校验器抢占脚本检查项导致测试无法构造场景。
+        """
+        if self.agentvalue_env == "production" and self.auth_demo_mode:
+            raise ValueError("生产环境禁止开启 AUTH_DEMO_MODE(auth_demo_mode)")
+        if self.agentvalue_env == "production" and self.llm_mock_mode:
+            # 与 auth_demo_mode 同级的灾难级风险：Mock 结果若流入生产，
+            # 会让虚构的评分与风险标记被当成真实绩效依据。
+            raise ValueError("生产环境禁止开启 LLM_MOCK_MODE(llm_mock_mode)")
+        return self
+
+
+@lru_cache()
+def get_settings() -> Settings:
+    return Settings()
+
+
+@dataclass(frozen=True)
+class RateLimitBuckets:
+    """四维令牌桶配额设置组（供 core/redis_rate_limit.py 组装桶规格）。
+
+    - capacity: 桶容量 = 突发上限（瞬时允许的连续请求数）
+    - refill:   每秒补充令牌数 = 稳态 QPS
+    - default_per_minute: 未单独配置维度的默认档（每分钟请求数）
+
+    默认值与 `Settings` 中 WS-4 限流配置保持一致；显式构造时覆盖。
+    """
+
+    tenant_capacity: int = 600
+    tenant_refill: float = 10.0
+    api_key_capacity: int = 300
+    api_key_refill: float = 5.0
+    user_capacity: int = 300
+    user_refill: float = 5.0
+    endpoint_capacity: int = 1200
+    endpoint_refill: float = 20.0
+    default_per_minute: int = 120
+
+    @classmethod
+    def from_settings(cls, settings: Settings) -> "RateLimitBuckets":
+        """从 Settings 实例组装（读取同名 WS-4 配置项，缺失时用默认值）。"""
+        return cls(
+            tenant_capacity=getattr(settings, "rate_limit_tenant_capacity", 600),
+            tenant_refill=getattr(settings, "rate_limit_tenant_refill", 10.0),
+            api_key_capacity=getattr(settings, "rate_limit_api_key_capacity", 300),
+            api_key_refill=getattr(settings, "rate_limit_api_key_refill", 5.0),
+            user_capacity=getattr(settings, "rate_limit_user_capacity", 300),
+            user_refill=getattr(settings, "rate_limit_user_refill", 5.0),
+            endpoint_capacity=getattr(settings, "rate_limit_endpoint_capacity", 1200),
+            endpoint_refill=getattr(settings, "rate_limit_endpoint_refill", 20.0),
+            default_per_minute=getattr(
+                settings, "redis_rate_limit_default_per_minute", 120
+            ),
+        )
+
+    def spec_for(self, dimension: str) -> "tuple[float, float]":
+        """返回 (capacity, refill_per_second)，未知维度回退默认档。"""
+        if dimension == "tenant":
+            return float(self.tenant_capacity), float(self.tenant_refill)
+        if dimension == "api_key":
+            return float(self.api_key_capacity), float(self.api_key_refill)
+        if dimension == "user":
+            return float(self.user_capacity), float(self.user_refill)
+        if dimension == "endpoint":
+            return float(self.endpoint_capacity), float(self.endpoint_refill)
+        return float(self.default_per_minute), float(self.default_per_minute) / 60.0

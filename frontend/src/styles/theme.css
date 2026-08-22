@@ -1,0 +1,138 @@
+/*
+ * Element Plus 主题色统一覆盖 — v2 视觉升级
+ * ----------------------------------------------------------------------------
+ * 设计方向：现代企业级数据产品 · 高级靛蓝主色 · 精修中性色 · 分层深度
+ * 保留全部 --el-* 变量名（视图与组件依赖），仅升级色值/派生色，杜绝破坏业务逻辑。
+ *
+ * 色彩系统：
+ *   Primary   Indigo-600 #4f46e5（主按钮/链接/聚焦，对白底约 6.3:1 达 WCAG AA）
+ *   Accent    Violet-600  #7c3aed（渐变点缀、品牌高光）
+ *   Success   Emerald-500 #10b981
+ *   Warning   Amber-500   #f59e0b
+ *   Danger    Rose-500    #f43f5e
+ *   Info      Slate-500   #64748b
+ * 中性色：页面 #f5f6f8 · 面板 #ffffff · 边框 #e7e9ee
+ */
+:root {
+  /* 主色 — Indigo */
+  --el-color-primary: #4f46e5;
+  --el-color-primary-light-3: #818cf8;
+  --el-color-primary-light-5: #a5b4fc;
+  --el-color-primary-light-7: #c7d2fe;
+  --el-color-primary-light-8: #dbe3ff;
+  --el-color-primary-light-9: #eef1ff;
+  --el-color-primary-dark-2: #4338ca;
+
+  /* 语义色 */
+  --el-color-success: #10b981;
+  --el-color-success-light-3: #34d399;
+  --el-color-success-light-5: #6ee7b7;
+  --el-color-success-light-7: #a7f3d0;
+  --el-color-success-light-8: #c6f6e5;
+  --el-color-success-light-9: #ecfdf5;
+  --el-color-success-dark-2: #059669;
+
+  --el-color-warning: #f59e0b;
+  --el-color-warning-light-3: #fbbf24;
+  --el-color-warning-light-5: #fcd34d;
+  --el-color-warning-light-7: #fde68a;
+  --el-color-warning-light-8: #fef3c7;
+  --el-color-warning-light-9: #fffbeb;
+  --el-color-warning-dark-2: #d97706;
+
+  --el-color-danger: #f43f5e;
+  --el-color-danger-light-3: #fb7185;
+  --el-color-danger-light-5: #fda4af;
+  --el-color-danger-light-7: #fecdd3;
+  --el-color-danger-light-8: #ffe4e6;
+  --el-color-danger-light-9: #fff1f2;
+  --el-color-danger-dark-2: #e11d48;
+
+  --el-color-error: #f43f5e;
+  --el-color-error-light-3: #fb7185;
+  --el-color-error-light-5: #fda4af;
+  --el-color-error-light-7: #fecdd3;
+  --el-color-error-light-8: #ffe4e6;
+  --el-color-error-light-9: #fff1f2;
+  --el-color-error-dark-2: #e11d48;
+
+  --el-color-info: #64748b;
+  --el-color-info-light-3: #94a3b8;
+  --el-color-info-light-5: #cbd5e1;
+  --el-color-info-light-7: #e2e8f0;
+  --el-color-info-light-8: #eef1f5;
+  --el-color-info-light-9: #f8fafc;
+  --el-color-info-dark-2: #475569;
+
+  /* 背景 */
+  --el-bg-color: #ffffff;
+  --el-bg-color-page: #f5f6f8;
+  --el-bg-color-overlay: #ffffff;
+
+  /* 文字 */
+  --el-text-color-primary: #111827;
+  --el-text-color-regular: #374151;
+  --el-text-color-secondary: #6b7280;
+  --el-text-color-placeholder: #9ca3af;
+  --el-text-color-disabled: #c2c7d0;
+
+  /* 边框 */
+  --el-border-color: #d8dbe1;
+  --el-border-color-light: #e5e7eb;
+  --el-border-color-lighter: #eef0f3;
+  --el-border-color-extra-light: #f4f5f7;
+
+  /* 填充 */
+  --el-fill-color: #f3f4f6;
+  --el-fill-color-light: #f5f6f8;
+  --el-fill-color-lighter: #fafbfc;
+  --el-fill-color-extra-light: #fbfcfd;
+  --el-fill-color-dark: #e9ebef;
+  --el-fill-color-blank: #ffffff;
+
+  /* 圆角 */
+  --el-border-radius-base: 10px;
+  --el-border-radius-small: 8px;
+  --el-border-radius-round: 999px;
+
+  /* 过渡 */
+  --el-transition-duration: 0.25s;
+  --el-transition-duration-fast: 0.15s;
+  --el-transition-duration-slow: 0.4s;
+}
+
+/* 暗色模式变量覆盖 — 冷色 slate 系 */
+html.dark {
+  --el-color-primary: #6366f1;
+  --el-color-primary-light-3: #818cf8;
+  --el-color-primary-light-5: #a5b4fc;
+  --el-color-primary-light-7: #c7d2fe;
+  --el-color-primary-light-8: #dbe3ff;
+  --el-color-primary-light-9: rgba(99, 102, 241, 0.15);
+  --el-color-primary-dark-2: #4f46e5;
+
+  --el-bg-color: #161a22;
+  --el-bg-color-page: #0e1116;
+  --el-bg-color-overlay: #1c212b;
+
+  --el-text-color-primary: #f3f4f6;
+  --el-text-color-regular: #d1d5db;
+  --el-text-color-secondary: #9ca3af;
+  --el-text-color-placeholder: #6b7280;
+  --el-text-color-disabled: #4b5563;
+
+  --el-border-color: #2a303b;
+  --el-border-color-light: #242a34;
+  --el-border-color-lighter: #1c212b;
+  --el-border-color-extra-light: #161a22;
+
+  --el-fill-color: #1c212b;
+  --el-fill-color-light: #161a22;
+  --el-fill-color-lighter: #141820;
+  --el-fill-color-extra-light: #12161d;
+  --el-fill-color-dark: #2a303b;
+  --el-fill-color-blank: #161a22;
+
+  --el-mask-color: rgba(0, 0, 0, 0.7);
+  --el-mask-color-extra-light: rgba(0, 0, 0, 0.3);
+}
