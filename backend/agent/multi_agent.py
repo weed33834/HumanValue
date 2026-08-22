@@ -49,7 +49,6 @@ from agent.interrupt_compat import (
 from agent.prompt_loader import PromptLoader
 from agent.tools import AgentToolkit
 from core.model_router import ModelRouter
-from core.providers.base import ChatMessage
 from core.tracing import tracer
 
 logger = logging.getLogger(__name__)
@@ -212,65 +211,10 @@ REPORT_WRITER_PROMPT = """你是报告生成专家。汇总各 Agent 的 artifac
 # 工具函数
 # ============================================================
 
-
-def _safe_json_parse(content: str) -> dict:
-    """容错 JSON 解析: LLM 输出可能含 markdown 代码块或前后缀"""
-    if not content:
-        return {}
-    text = content.strip()
-    # 去掉 markdown code fence (```json ... ``` 或 ``` ... ```)
-    if text.startswith("```"):
-        lines = text.split("\n")
-        if lines and lines[0].startswith("```"):
-            lines = lines[1:]
-        if lines and lines[-1].strip().startswith("```"):
-            lines = lines[:-1]
-        text = "\n".join(lines).strip()
-    try:
-        return json.loads(text)
-    except Exception:
-        # 尝试截取第一个 { 到最后一个 } 之间的内容
-        first = text.find("{")
-        last = text.rfind("}")
-        if first >= 0 and last > first:
-            try:
-                return json.loads(text[first : last + 1])
-            except Exception:
-                pass
-    return {}
-
-
-async def _call_llm_json(
-    model_router: ModelRouter,
-    system_prompt: str,
-    user_prompt: str = "",
-) -> dict:
-    """统一 LLM 调用 helper, 返回解析后的 JSON dict。
-
-    失败时不抛异常, 返回 {"_error": "<msg>"} 让调用方根据返回内容判断。
-    """
-    try:
-        provider, tier = await model_router.get_provider_with_fallback()
-    except Exception as e:
-        logger.warning("model_router 获取 provider 失败: %s", e)
-        return {"_error": f"provider unavailable: {e}"}
-
-    messages: List[ChatMessage] = []
-    if system_prompt:
-        messages.append(ChatMessage(role="system", content=system_prompt))
-    if user_prompt:
-        messages.append(ChatMessage(role="user", content=user_prompt))
-
-    try:
-        completion = await provider.chat_completion(messages=messages)
-        parsed = _safe_json_parse(completion.content)
-        if not parsed:
-            # 解析失败, 把原文回传, 调用方可作为 fallback 文本使用
-            return {"_raw": completion.content}
-        return parsed
-    except Exception as e:
-        logger.warning("LLM 调用失败: %s", e)
-        return {"_error": f"llm call failed: {e}"}
+# JSON 容错解析与 LLM 调用 helper 已收口至 core/json_utils(唯一实现),
+# 此处以旧名称导入,调用点无需改动
+from agent._json_util import call_llm_json as _call_llm_json  # noqa: E402
+from agent._json_util import safe_json_parse as _safe_json_parse  # noqa: E402
 
 
 def _append_timeline(state: dict, node: str, status: str = "ok", **extra: Any) -> list:

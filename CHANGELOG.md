@@ -3,6 +3,33 @@
 本文件记录 HumanValue 所有显著变更,格式遵循 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/),
 版本号遵循 [语义化版本](https://semver.org/lang/zh-CN/)。
 
+## [v1.0.8] - 2026-08-22
+
+### 全量审计第三批: 重复造轮子收口 (JSON 解析 / ISO 时间解析)
+
+**JSON 容错解析 ×4 收口为唯一实现 `core/json_utils.py`**(此前 agent/_json_util、
+agent/multi_agent、agent/skills、services/graph_rag_service 各持一份拷贝,
+失败语义分裂且部分已退化):
+
+- 新增权威 API: `find_json_object`(失败返回 None,合法 `{}` 可区分) +
+  `safe_json_dict`(失败返回 {},兼容历史语义) + `call_llm_json/call_llm_text`
+- 补齐历史实现缺失的单行代码围栏(`` ```json {...} ``` ``)支持
+- `agent/_json_util.py` 改为薄委托,旧导入路径保持有效;
+  multi_agent 删除逐字拷贝的 `_safe_json_parse/_call_llm_json`
+- skills `_extract_json`、graph_rag `_extract_json_block/_safe_json_loads`
+  改为委托;llm_judge(两处)的裸 `json.loads` 升级为容错解析,
+  解析失败时的正则兜底路径保持不变
+
+**ISO 时间解析 ×3 收口至 `api/admin/_common.parse_iso_datetime`**
+(api_health/analytics_v2/trace_v2 三份逐字拷贝删除);
+保留 Z/z 后缀兼容,新增 default= 参数支持失败返回默认值。
+billing_routes 的变体契约(Optional/无时区归一)经判定语义不同,保留并文档化。
+
+**判定保留的非问题**: SSE 缓冲(单实现)、rate_limit 双层设计(刻意分层)、
+JWT/密码/邮箱(正确使用库)、数据集生成器双版本(文档化的有意分叉)。
+
+新增 36 个专项测试(test_json_utils/test_admin_common)。
+
 ## [v1.0.7] - 2026-08-22
 
 ### 全量审计第二批: 基础设施一致性与告警链路修复

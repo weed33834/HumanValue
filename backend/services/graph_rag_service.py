@@ -27,6 +27,7 @@ from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.database import AsyncSessionLocal
+from core import json_utils as core_json_utils
 from core.llm_call import call_llm_with_fallback
 from core.providers.base import ChatMessage
 from core.tenant_context import tenant_scope
@@ -580,28 +581,14 @@ class GraphRAGService:
 
     @staticmethod
     def _safe_json_loads(content: str) -> Optional[Any]:
-        """安全 json.loads, 失败返回 None"""
-        try:
-            return json.loads(content)
-        except (json.JSONDecodeError, ValueError, TypeError):
-            return None
+        """安全 json.loads, 失败返回 None(实现已收口至 core.json_utils)"""
+        return core_json_utils.find_json_object(content)
 
     @staticmethod
     def _extract_json_block(content: str) -> Optional[Any]:
-        """提取 ```json ... ``` 代码块或最外层 { ... } 后 json.loads"""
-        # markdown 代码块
-        m = re.search(r"```(?:json)?\s*(\{.*?\})\s*```", content, re.DOTALL)
-        if m:
-            parsed = GraphRAGService._safe_json_loads(m.group(1))
-            if parsed is not None:
-                return parsed
-        # 最外层花括号
-        m = re.search(r"\{.*\}", content, re.DOTALL)
-        if m:
-            parsed = GraphRAGService._safe_json_loads(m.group(0))
-            if parsed is not None:
-                return parsed
-        return None
+        """提取 ```json ... ``` 代码块或最外层 { ... } 后 json.loads
+        (实现已收口至 core.json_utils.find_json_object)"""
+        return core_json_utils.find_json_object(content)
 
     @staticmethod
     def _normalize_entities(raw: Any) -> List[Dict[str, Any]]:

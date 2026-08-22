@@ -23,6 +23,7 @@ from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.database import AsyncSessionLocal
+from core import json_utils as core_json_utils
 from core.llm_call import call_llm_with_fallback
 from core.providers.base import ChatMessage
 from core.tenant_context import tenant_scope
@@ -623,28 +624,27 @@ class LLMJudgeService:
         scores: Dict[str, Any] = {}
         feedback = ""
 
-        # 尝试解析 JSON
-        try:
-            data = json.loads(content)
-            if isinstance(data, dict):
-                for key in metrics:
-                    if key in data:
-                        val = data[key]
-                        if isinstance(val, (int, float)):
-                            scores[key] = max(0, min(100, int(val)))
-                if "overall" in data:
-                    val = data["overall"]
+        # 尝试解析 JSON(find_json_object 提供围栏/截取容错, 失败返回 None)
+        data = core_json_utils.find_json_object(content)
+        if isinstance(data, dict):
+            for key in metrics:
+                if key in data:
+                    val = data[key]
                     if isinstance(val, (int, float)):
-                        scores["overall"] = max(0, min(100, int(val)))
-                else:
-                    # 自动计算 overall
-                    metric_vals = [
-                        v for v in scores.values() if isinstance(v, (int, float))
-                    ]
-                    if metric_vals:
-                        scores["overall"] = round(sum(metric_vals) / len(metric_vals))
-                feedback = str(data.get("feedback", ""))
-        except (json.JSONDecodeError, ValueError, TypeError):
+                        scores[key] = max(0, min(100, int(val)))
+            if "overall" in data:
+                val = data["overall"]
+                if isinstance(val, (int, float)):
+                    scores["overall"] = max(0, min(100, int(val)))
+            else:
+                # 自动计算 overall
+                metric_vals = [
+                    v for v in scores.values() if isinstance(v, (int, float))
+                ]
+                if metric_vals:
+                    scores["overall"] = round(sum(metric_vals) / len(metric_vals))
+            feedback = str(data.get("feedback", ""))
+        else:
             # JSON 解析失败, 尝试提取分数
             feedback = f"评分解析失败: {content[:200]}"
             for metric in metrics:

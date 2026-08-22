@@ -79,34 +79,8 @@ class SloUpdate(BaseModel):
 # ============================================================
 
 
-def _parse_datetime(value: str, field_name: str) -> datetime:
-    """解析 ISO 8601 日期时间字符串，失败时抛 422。
-
-    兼容多种常见格式:
-    - 带时区偏移: 2026-07-01T00:00:00+00:00（URL 中 + 需编码为 %2B）
-    - Z 后缀（JS toISOString 等）: 2026-07-01T00:00:00Z
-    - 无时区: 2026-07-01T00:00:00（按 UTC 处理）
-    - 仅日期: 2026-07-01（按当日 00:00:00 UTC 处理）
-    """
-    raw = value.strip()
-    # Z 后缀 → +00:00（Python 3.10 的 fromisoformat 不支持 Z）
-    if raw.endswith("Z") or raw.endswith("z"):
-        raw = raw[:-1] + "+00:00"
-    try:
-        dt = datetime.fromisoformat(raw)
-        if dt.tzinfo is None:
-            dt = dt.replace(tzinfo=timezone.utc)
-        return dt
-    except ValueError:
-        # 尝试仅日期格式
-        try:
-            dt = datetime.fromisoformat(raw + "T00:00:00+00:00")
-            return dt
-        except ValueError:
-            raise HTTPException(
-                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-                detail=f"{field_name} 格式无效，需 ISO 8601（如 2026-07-01T00:00:00Z）",
-            )
+# ISO 时间解析已收口至 _common(全 admin 路由唯一实现), 以旧名导入保持调用点不变
+from api.admin._common import parse_iso_datetime as _parse_datetime  # noqa: E402
 
 
 def _normalize_endpoint(path: str) -> str:

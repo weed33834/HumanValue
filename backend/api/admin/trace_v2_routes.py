@@ -166,28 +166,8 @@ class CostBreakdownResponse(BaseModel):
 # 内部工具
 # ============================================================
 
-
-def _parse_datetime(value: str, field_name: str) -> datetime:
-    """解析 ISO 8601 日期时间字符串，失败时抛 422。
-
-    与 analytics_v2_routes._parse_datetime 行为一致：兼容 Z 后缀、无时区、纯日期。
-    """
-    raw = value.strip()
-    if raw.endswith("Z") or raw.endswith("z"):
-        raw = raw[:-1] + "+00:00"
-    try:
-        dt = datetime.fromisoformat(raw)
-        if dt.tzinfo is None:
-            dt = dt.replace(tzinfo=timezone.utc)
-        return dt
-    except ValueError:
-        try:
-            return datetime.fromisoformat(raw + "T00:00:00+00:00")
-        except ValueError:
-            raise HTTPException(
-                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-                detail=f"{field_name} 格式无效，需 ISO 8601（如 2026-07-01T00:00:00Z）",
-            )
+# ISO 时间解析已收口至 _common(全 admin 路由唯一实现), 以旧名导入保持调用点不变
+from api.admin._common import parse_iso_datetime as _parse_datetime  # noqa: E402
 
 
 def _build_filters(
