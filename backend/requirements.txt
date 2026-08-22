@@ -69,7 +69,7 @@ aiosmtplib>=3.0.0
 rank-bm25>=0.2.2
 # 工具管理 web_search_tool: duckduckgo-search 提供免 API Key 的网络搜索能力
 # 未安装时 web_search_tool 降级为不可用提示,不影响其他工具
-duckduckgo-search>=7.0.0
+duckduckgo-search>=8.1.1
 # 工具管理 web_fetch: trafilatura 提供高质量网页正文提取 (去噪/去模板/保留结构)
 # 未安装时 web_fetch 降级为基本 HTML 标签剥离
 trafilatura>=1.12.0
