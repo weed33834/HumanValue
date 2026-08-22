@@ -8,7 +8,7 @@ langgraph>=1.2.8
 langchain>=0.3.0
 # P1 工具管理: LangChain OpenAI Chat (ReAct Agent 用 ChatOpenAI.bind_tools)
 # langchain 0.3+ 已不再自动带 langchain-openai,需独立安装
-langchain-openai>=0.2.0
+langchain-openai>=1.5.2
 # P1 工具管理: MCP (Model Context Protocol) 适配器,接入外部 MCP 服务器工具
 langchain-mcp-adapters>=0.2.0
 openai>=2.44.0
