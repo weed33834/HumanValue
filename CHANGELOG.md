@@ -3,6 +3,13 @@
 本文件记录 HumanValue 所有显著变更,格式遵循 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/),
 版本号遵循 [语义化版本](https://semver.org/lang/zh-CN/)。
 
+## [v1.0.1] - 2026-08-22
+
+### 平台定位更正
+
+- **主仓库更正**: GitHub (`weed33834/HumanValue`) 为唯一主仓库,承担开发、Issue/PR 与 CI; GitCode 与 Gitee 为发布镜像。
+- 三语 README 的"仓库"表格与快速开始克隆地址同步更正,消除文档与实际平台策略相反的问题。
+
 ## [v1.0.0] - 2026-08-22
 
 ### 历史重建基线

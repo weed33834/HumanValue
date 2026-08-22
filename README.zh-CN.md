@@ -16,7 +16,7 @@
   <img src="https://img.shields.io/badge/FastAPI-0.139+-009688?logo=fastapi&logoColor=white" alt="FastAPI" />
   <img src="https://img.shields.io/badge/Vue_3-4FC08D?logo=vuedotjs&logoColor=white" alt="Vue 3" />
   <img src="https://img.shields.io/badge/LangGraph-agent-FF6B6B" alt="LangGraph" />
-  <a href="CHANGELOG.md"><img src="https://img.shields.io/badge/version-1.0.0-blue.svg" alt="版本 1.0.0" /></a>
+  <a href="CHANGELOG.md"><img src="https://img.shields.io/badge/version-1.0.1-blue.svg" alt="版本 1.0.1" /></a>
 </p>
 
 <p align="center">
@@ -67,7 +67,7 @@
 ### Docker Compose（推荐）
 
 ```bash
-git clone https://gitcode.com/badhope/HumanValue.git
+git clone https://github.com/weed33834/HumanValue.git
 cd HumanValue
 cp backend/.env.example backend/.env   # 设置 JWT_SECRET_KEY 与模型 API Key
 docker compose up -d --build
@@ -114,8 +114,8 @@ python -m eval.evaluate --mock
 
 | 平台 | 地址 |
 |---|---|
-| GitCode（主仓库） | https://gitcode.com/badhope/HumanValue |
-| GitHub（镜像） | https://github.com/weed33834/HumanValue |
+| GitHub（主仓库） | https://github.com/weed33834/HumanValue |
+| GitCode（镜像） | https://gitcode.com/badhope/HumanValue |
 | Gitee（镜像） | https://gitee.com/badhope/HumanValue |
 
 ## 许可证
