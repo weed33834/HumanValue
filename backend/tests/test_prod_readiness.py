@@ -136,7 +136,9 @@ class TestCheckReadiness:
         fek_check = next(
             c for c in result["checks"] if c["name"] == "field_encryption_key"
         )
-        assert fek_check["status"] == "FAIL", "k8s 模板 FIELD_ENCRYPTION_KEY 占位应判 FAIL"
+        assert (
+            fek_check["status"] == "FAIL"
+        ), "k8s 模板 FIELD_ENCRYPTION_KEY 占位应判 FAIL"
 
     def test_jwt_set_passes(self):
         """JWT_SECRET_KEY 修改为非默认值后 PASS。"""
