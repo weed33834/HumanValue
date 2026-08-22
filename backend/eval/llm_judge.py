@@ -27,6 +27,7 @@ from typing import Any, Dict, List, Optional
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
+from core import json_utils as core_json_utils
 from core.llm_call import call_llm_with_fallback
 from core.providers.base import BaseProvider, ChatMessage
 from eval.constants import NEGATIVE_WORDS
@@ -145,11 +146,16 @@ class LLMJudge:
     @staticmethod
     def _parse_score(content: str, dimension: str) -> dict:
         """从 LLM 返回中解析 score 与 reason，做范围裁剪与容错"""
-        try:
-            data = json.loads(content)
-            score = int(data.get("score", 0))
-            reason = str(data.get("reason", ""))
-        except (json.JSONDecodeError, ValueError, TypeError):
+        # find_json_object 提供围栏/截取容错; 解析不出时走与原失败路径一致的处理
+        data = core_json_utils.find_json_object(content)
+        if isinstance(data, dict):
+            try:
+                score = int(data.get("score", 0))
+                reason = str(data.get("reason", ""))
+            except (ValueError, TypeError):
+                score = 0
+                reason = f"{dimension} 打分解析失败：{content[:80]}"
+        else:
             score = 0
             reason = f"{dimension} 打分解析失败：{content[:80]}"
         score = max(0, min(100, score))

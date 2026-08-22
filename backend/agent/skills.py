@@ -17,12 +17,12 @@ from __future__ import annotations
 
 import json
 import logging
-import re
 from typing import Any, Dict, List, Optional
 
 from sqlalchemy import select
 
 from core.database import get_db_session
+from core import json_utils as core_json_utils
 from core.providers.base import ChatMessage
 from models.skill import Skill
 
@@ -177,37 +177,10 @@ _BUILTIN_SKILLS: List[Dict[str, Any]] = [
 def _extract_json(text: str) -> Optional[dict]:
     """从 LLM 输出中尝试提取 JSON 对象。
 
-    顺序:
-    1. 去除 markdown ```json ... ``` 代码块
-    2. 直接 json.loads 整段
-    3. 贪婪匹配第一个 {...} 块再解析
-    解析失败返回 None(不抛异常, 由调用方决定降级行为)。
+    实现已收口至 core.json_utils.find_json_object(全仓唯一实现);
+    本包装保留"失败返回 None"的历史语义供 SkillExecutor 调用方使用。
     """
-    if not text:
-        return None
-    cleaned = text.strip()
-    # 去除 markdown 代码块包裹
-    if cleaned.startswith("```json"):
-        cleaned = cleaned[len("```json") :]
-    elif cleaned.startswith("```"):
-        cleaned = cleaned[3:]
-    if cleaned.endswith("```"):
-        cleaned = cleaned[:-3]
-    cleaned = cleaned.strip()
-
-    try:
-        return json.loads(cleaned)
-    except Exception:
-        pass
-
-    # 贪婪匹配第一个 {...}
-    match = re.search(r"\{[\s\S]*\}", cleaned)
-    if match:
-        try:
-            return json.loads(match.group(0))
-        except Exception:
-            return None
-    return None
+    return core_json_utils.find_json_object(text)
 
 
 class SkillExecutor:
