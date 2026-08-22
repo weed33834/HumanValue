@@ -8,7 +8,7 @@ arq 任务队列 Worker(P3 规模化就绪,H2)
 特点:
 1. 独立进程,与 FastAPI 解耦,可多实例水平扩展
 2. 自动重投:arq max_tries 配置,失败重试到顶入死信队列
-3. 死信队列:`agentvalue:dead_letter:{job_id}`,运维可捞起重投
+3. 死信队列:`humanvalue:dead_letter:{job_id}`,运维可捞起重投
 4. 优雅关闭:on_shutdown 关闭 DB 连接池
 
 设计要点:
@@ -37,7 +37,7 @@ from core.config import get_settings
 logger = logging.getLogger(__name__)
 
 # 死信队列 key 前缀(与 RedisJobQueue 一致的命名空间)
-DEAD_LETTER_PREFIX = "agentvalue:dead_letter:"
+DEAD_LETTER_PREFIX = "humanvalue:dead_letter:"
 
 # arq 队列名(默认队列)
 QUEUE_NAME = "evaluations"
@@ -101,7 +101,7 @@ async def run_evaluation_task(
     死信机制:
     - arq 在 job_try > max_tries 时拒绝任务(不再调用本函数,见 arq.worker.run_job)
     - 因此当 job_try >= max_tries 且本次仍失败时,本函数是最后一次执行
-    - 此时写死信队列,运维可从 agentvalue:dead_letter:{job_id} 捞起重投
+    - 此时写死信队列,运维可从 humanvalue:dead_letter:{job_id} 捞起重投
 
     P3 修复:AppState 从 on_startup 创建的 ctx["app_state"] 取,不再调
     api.deps.get_app_state(request)(arq worker 是独立进程,无 request 上下文,

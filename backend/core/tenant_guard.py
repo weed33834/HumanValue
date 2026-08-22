@@ -13,7 +13,7 @@ SELECT 都带租户条件」是不现实的——审计已经发现三个大服�
 两种模式（配置项 ``tenant_guard_mode``）
 --------------------------------------
 - ``"warn"``（**默认**）：只打 WARNING 日志（含 SQL 摘要 + 业务侧调用栈）并给
-  Prometheus 计数器 ``agentvalue_tenant_guard_violations_total`` +1。**不改变
+  Prometheus 计数器 ``humanvalue_tenant_guard_violations_total`` +1。**不改变
   任何行为**，用于线上跑一轮收集误报清单。
 - ``"enforce"``：直接抛 ``CrossTenantQueryError``，请求失败。
 
@@ -23,7 +23,7 @@ SELECT 都带租户条件」是不现实的——审计已经发现三个大服�
     TENANT_GUARD_MODE=enforce
 
 强烈建议先在 warn 模式跑满一个业务周期，把
-``agentvalue_tenant_guard_violations_total`` 打到 0 之后再切 enforce。
+``humanvalue_tenant_guard_violations_total`` 打到 0 之后再切 enforce。
 
 误报与逃生舱
 ------------

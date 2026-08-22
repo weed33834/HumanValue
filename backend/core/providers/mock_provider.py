@@ -17,7 +17,7 @@
 
     LLM_MOCK_MODE=true
 
-安全护栏：``AGENTVALUE_ENV=production`` 时禁止开启（见 ``core/config.py``
+安全护栏：``HUMANVALUE_ENV=production`` 时禁止开启（见 ``core/config.py``
 的 validator），避免误把假数据当成真实绩效结论。
 
 实现要点：

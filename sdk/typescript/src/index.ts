@@ -8,7 +8,7 @@
  *
  * 用法：
  * ```ts
- * import { HumanValueClient, verifyWebhookSignature } from "@agentvalue/sdk";
+ * import { HumanValueClient, verifyWebhookSignature } from "@humanvalue/sdk";
  *
  * const client = new HumanValueClient({ baseUrl: "https://av.example.com", apiKey: "ak_xxx" });
  * const me = await client.getMe();

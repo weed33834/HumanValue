@@ -10,7 +10,7 @@ kind: HorizontalPodAutoscaler
 metadata:
   name: backend
   labels:
-    app.kubernetes.io/name: agentvalue
+    app.kubernetes.io/name: humanvalue
     app.kubernetes.io/component: backend
 spec:
   scaleTargetRef:

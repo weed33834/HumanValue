@@ -1,9 +1,9 @@
 # =============================================================================
 # 前端 Deployment + Service
 # -----------------------------------------------------------------------------
-# 镜像: agentvalue-frontend:latest(本地构建,需先加载到集群:
-#        kind load docker-image agentvalue-frontend:latest
-#        或 minikube image load agentvalue-frontend:latest)
+# 镜像: humanvalue-frontend:latest(本地构建,需先加载到集群:
+#        kind load docker-image humanvalue-frontend:latest
+#        或 minikube image load humanvalue-frontend:latest)
 # 端口: 80   副本: 2   就绪检查: GET /(nginx 返回 index.html 即 200)
 # 资源: 请求 100m/128Mi,上限 250m/256Mi
 #
@@ -15,13 +15,13 @@ kind: Deployment
 metadata:
   name: frontend
   labels:
-    app.kubernetes.io/name: agentvalue
+    app.kubernetes.io/name: humanvalue
     app.kubernetes.io/component: frontend
 spec:
   replicas: 2
   selector:
     matchLabels:
-      app.kubernetes.io/name: agentvalue
+      app.kubernetes.io/name: humanvalue
       app.kubernetes.io/component: frontend
   strategy:
     type: RollingUpdate
@@ -31,13 +31,13 @@ spec:
   template:
     metadata:
       labels:
-        app.kubernetes.io/name: agentvalue
+        app.kubernetes.io/name: humanvalue
         app.kubernetes.io/component: frontend
     spec:
       terminationGracePeriodSeconds: 15
       containers:
         - name: frontend
-          image: agentvalue-frontend:latest
+          image: humanvalue-frontend:latest
           imagePullPolicy: IfNotPresent
           ports:
             - name: http
@@ -73,12 +73,12 @@ kind: Service
 metadata:
   name: frontend
   labels:
-    app.kubernetes.io/name: agentvalue
+    app.kubernetes.io/name: humanvalue
     app.kubernetes.io/component: frontend
 spec:
   type: ClusterIP
   selector:
-    app.kubernetes.io/name: agentvalue
+    app.kubernetes.io/name: humanvalue
     app.kubernetes.io/component: frontend
   ports:
     - name: http

@@ -257,7 +257,7 @@ Key variables you'll likely need to customize:
 | Variable | Why Change It |
 |---|---|
 | `JWT_SECRET_KEY` | **Production requirement** — generate a strong random secret |
-| `AGENTVALUE_ENV=production` | **Production requirement** — enables safety guards |
+| `HUMANVALUE_ENV=production` | **Production requirement** — enables safety guards |
 | `CLOUD_API_KEY` | To use cloud LLM models |
 | `CORS_ORIGINS` | **Production requirement** — set to your frontend domain |
 | `DATABASE_URL` | Switch to PostgreSQL for production |

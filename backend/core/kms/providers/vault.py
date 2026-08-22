@@ -62,8 +62,8 @@ class VaultKMSProvider(KMSProvider):
         namespace: Optional[str] = None,
         transit_mount: str = "transit",
         kv_mount: str = "secret",
-        kek_name: str = "agentvalue-field-kek",
-        jwt_key_path: str = "agentvalue/jwt-signing-key",
+        kek_name: str = "humanvalue-field-kek",
+        jwt_key_path: str = "humanvalue/jwt-signing-key",
         verify_tls: bool = True,
         token_renew_interval_seconds: int = 300,
     ):

@@ -786,7 +786,7 @@ def test_auth_seed_demo_users(client, mock_app_state):
     # 用演示账号登录
     resp = client.post(
         "/api/v1/auth/login",
-        json={"email": "employee@humanvalue.ai", "password": "agentvalue123"},
+        json={"email": "employee@humanvalue.ai", "password": "humanvalue123"},
     )
     assert resp.status_code == 200
     assert resp.json()["role"] == "employee"
@@ -1159,7 +1159,7 @@ def _metric_value(client, name: str, label_match: str) -> float:
 
 
 def test_evaluation_failure_metric_on_graph_error(client, test_settings):
-    """评估图执行失败时,agentvalue_evaluation_failures_total{reason="graph_error"} 递增
+    """评估图执行失败时,humanvalue_evaluation_failures_total{reason="graph_error"} 递增
 
     FailingModelRouter 的 Provider 抛 RuntimeError,call_llm 节点捕获后返回
     {"error": ...},routes 层走 graph_error 失败路径并埋点。
@@ -1181,7 +1181,7 @@ def test_evaluation_failure_metric_on_graph_error(client, test_settings):
     client.app.state.app_state = state
 
     before = _metric_value(
-        client, "agentvalue_evaluation_failures_total", 'reason="graph_error"'
+        client, "humanvalue_evaluation_failures_total", 'reason="graph_error"'
     )
 
     payload = {
@@ -1197,6 +1197,6 @@ def test_evaluation_failure_metric_on_graph_error(client, test_settings):
     assert job["status"] == "failed"
 
     after = _metric_value(
-        client, "agentvalue_evaluation_failures_total", 'reason="graph_error"'
+        client, "humanvalue_evaluation_failures_total", 'reason="graph_error"'
     )
     assert after > before

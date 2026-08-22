@@ -1,4 +1,4 @@
-# @agentvalue/sdk
+# @humanvalue/sdk
 
 HumanValue 开放 API 的官方 TypeScript SDK（WS-3 集成与开放能力，对标 Stripe / Svix）。
 
@@ -17,7 +17,7 @@ npm run build        # 产出 dist/index.js + dist/index.d.ts
 ## 快速开始
 
 ```ts
-import { HumanValueClient } from "@agentvalue/sdk";
+import { HumanValueClient } from "@humanvalue/sdk";
 
 const client = new HumanValueClient({
   baseUrl: "https://av.example.com",
@@ -47,7 +47,7 @@ const traces = await client.listTraces({ kind: "llm" });
 **必须用原始请求体**，不要 JSON.parse 后再 JSON.stringify（键序/空白差异会导致校验失败）。
 
 ```ts
-import { verifyWebhookSignature } from "@agentvalue/sdk";
+import { verifyWebhookSignature } from "@humanvalue/sdk";
 
 const rawBody = await request.text();
 const ok = verifyWebhookSignature({

@@ -88,12 +88,12 @@ try:  # pragma: no cover - 取决于运行环境是否安装 prometheus_client
     from prometheus_client import Counter as _Counter
 
     TRACE_RECORDS_DROPPED_TOTAL = _Counter(
-        "agentvalue_trace_records_dropped_total",
+        "humanvalue_trace_records_dropped_total",
         "因写入队列打满而丢弃的 trace/span 记录数",
         ["record_type"],
     )
     TRACE_WRITE_FAILURES_TOTAL = _Counter(
-        "agentvalue_trace_write_failures_total",
+        "humanvalue_trace_write_failures_total",
         "trace/span 落库失败次数",
     )
 except Exception as _exc:  # pragma: no cover

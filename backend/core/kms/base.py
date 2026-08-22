@@ -33,7 +33,7 @@ class KMSProvider(ABC):
 
         Args:
             key_spec: "AES_256" (默认,32 字节) 或 "AES_128" (16 字节)
-            encryption_context: ABAC 上下文 (如 {"app": "agentvalue", "tenant": "t1"}),
+            encryption_context: ABAC 上下文 (如 {"app": "humanvalue", "tenant": "t1"}),
                 解密时需传入相同上下文 (AWS 必须一致,Vault 仅校验存在)
 
         Returns:

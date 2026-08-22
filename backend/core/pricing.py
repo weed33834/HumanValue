@@ -12,7 +12,7 @@ Google 官方定价页的表述一致，避免 `$/1K` 与 `$/1M` 混用导致 10
 2. 本模块 ``MODEL_PRICING`` 内置表；
 3. ``DEFAULT_PRICE`` 兜底 —— 此时 ``CostBreakdown.is_fallback=True``，
    同时打 WARNING 日志并累加 Prometheus 计数器
-   ``agentvalue_pricing_fallback_total``，便于运维发现"定价表该更新了"。
+   ``humanvalue_pricing_fallback_total``，便于运维发现"定价表该更新了"。
 
 设计红线：**未知模型绝不静默计 0**。计 0 会让成本看板长期显示"免费"，
 是比价格偏差更严重的错误（审计结论 2.1 的直接诱因）。
@@ -146,7 +146,7 @@ try:  # pragma: no cover - 取决于运行环境是否安装 prometheus_client
     from prometheus_client import Counter as _Counter
 
     PRICING_FALLBACK_TOTAL = _Counter(
-        "agentvalue_pricing_fallback_total",
+        "humanvalue_pricing_fallback_total",
         "未命中内置定价表、走 DEFAULT_PRICE 兜底的次数（按模型名）",
         ["model"],
     )

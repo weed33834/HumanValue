@@ -1,5 +1,5 @@
 {
-  "name": "@agentvalue/sdk",
+  "name": "@humanvalue/sdk",
   "version": "0.1.0",
   "description": "HumanValue 开放 API 的 TypeScript SDK（X-API-Key 门控客户端 + Webhook 签名校验）",
   "main": "dist/index.js",
@@ -9,7 +9,7 @@
     "build": "tsc -p tsconfig.json",
     "test": "node --test dist/__tests__"
   },
-  "keywords": ["agentvalue", "webhook", "sdk", "llm"],
+  "keywords": ["humanvalue", "webhook", "sdk", "llm"],
   "license": "Apache-2.0",
   "engines": {
     "node": ">=18"

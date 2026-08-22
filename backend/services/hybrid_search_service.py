@@ -13,7 +13,7 @@ BM25 实现：使用 rank_bm25 库（已在 requirements.txt 中声明为必选�
 
 WS-4 多租户隔离（两层防御）
 --------------------------
-第一层（既有）：路由层按租户拆 collection（agentvalue_kb_{tenant_id}），并在
+第一层（既有）：路由层按租户拆 collection（humanvalue_kb_{tenant_id}），并在
 `_resolve_collection_name` 里校验 collection 归属。
 第二层（本次新增）：写入时把 tenant_id 打进 chunk metadata，检索时按当前租户
 过滤；BM25 索引缓存键也带上租户，避免同进程内跨租户复用倒排索引。

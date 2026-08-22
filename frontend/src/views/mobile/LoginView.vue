@@ -73,7 +73,7 @@ const loading = ref(false)
 const error = ref('')
 
 const email = ref(import.meta.env.DEV ? 'boss@humanvalue.ai' : '')
-const password = ref(import.meta.env.DEV ? 'agentvalue123' : '')
+const password = ref(import.meta.env.DEV ? 'humanvalue123' : '')
 
 // 移动端首页映射（登录后落对应 /m 页面）
 const mobileHome = {

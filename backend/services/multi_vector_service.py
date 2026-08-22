@@ -15,7 +15,7 @@ ChromaDB collection 中。检索时对三路结果做多路召回，再通过 RR
 
 WS-4 多租户隔离（两层防御）
 --------------------------
-第一层（既有）：路由层按租户拆 collection 前缀（agentvalue_mv_{tenant_id}）。
+第一层（既有）：路由层按租户拆 collection 前缀（humanvalue_mv_{tenant_id}）。
 第二层（本次新增）：每个 chunk 的 metadata 打上 tenant_id，检索/删除/统计时
 按当前租户过滤。这样即便调用方误传了共享 collection 前缀，也不会串数据。
 
@@ -307,7 +307,7 @@ class MultiVectorSearchService:
         settings: 应用配置，未提供时从 kb_store 或全局获取
         collection_prefix: collection 名称前缀，三种粒度 collection 名分别为
             {prefix}_paragraph / {prefix}_sentence / {prefix}_keyword。
-            默认 "kb"；多租户场景应传入租户隔离前缀（如 agentvalue_mv_{tenant_id}）。
+            默认 "kb"；多租户场景应传入租户隔离前缀（如 humanvalue_mv_{tenant_id}）。
         tenant_id: WS-4 租户绑定，缺省取 `get_current_tenant()`。作为
             collection 前缀之外的第二层隔离（chunk metadata 打标 + 检索过滤）。
     """

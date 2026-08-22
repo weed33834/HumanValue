@@ -153,7 +153,7 @@ class TestGetFieldCipherFactory:
 
         key = _make_key()
         monkeypatch.setenv("FIELD_ENCRYPTION_KEY", key)
-        monkeypatch.setenv("AGENTVALUE_ENV", "")  # 非生产
+        monkeypatch.setenv("HUMANVALUE_ENV", "")  # 非生产
         # 用 reset_settings 强制重读
         from core.config import get_settings
 
@@ -182,7 +182,7 @@ class TestGetFieldCipherFactory:
             vault_addr="http://vault:8200",
             vault_auth_method="token",
             vault_token="dummy-token",
-            vault_field_kek_name="agentvalue-test-kek",
+            vault_field_kek_name="humanvalue-test-kek",
         )
         monkeypatch.setattr("core.config.get_settings", lambda: settings)
 
@@ -259,7 +259,7 @@ class TestGetFieldCipherFactory:
         settings = Settings(
             field_encryption_key=key,
             field_encryption_backend="vault",
-            agentvalue_env="",  # 非生产
+            humanvalue_env="",  # 非生产
         )
         monkeypatch.setattr("core.config.get_settings", lambda: settings)
 
@@ -285,7 +285,7 @@ class TestGetFieldCipherFactory:
         settings = Settings(
             field_encryption_key=key,
             field_encryption_backend="vault",
-            agentvalue_env="production",  # 生产
+            humanvalue_env="production",  # 生产
             auth_demo_mode=False,
         )
         monkeypatch.setattr("core.config.get_settings", lambda: settings)
@@ -362,7 +362,7 @@ class TestJWTSecretVaultFallback:
         settings = Settings(
             jwt_secret_key="env-fallback",
             field_encryption_backend="vault",
-            agentvalue_env="",
+            humanvalue_env="",
         )
         monkeypatch.setattr("core.config.get_settings", lambda: settings)
 
@@ -384,7 +384,7 @@ class TestJWTSecretVaultFallback:
         settings = Settings(
             jwt_secret_key="env-fallback",
             field_encryption_backend="vault",
-            agentvalue_env="production",
+            humanvalue_env="production",
             auth_demo_mode=False,
         )
         monkeypatch.setattr("core.config.get_settings", lambda: settings)
@@ -472,7 +472,7 @@ class TestKMSFactory:
         settings = Settings(
             field_encryption_backend="local",
             field_encryption_key=_make_key(),
-            agentvalue_env="production",
+            humanvalue_env="production",
             auth_demo_mode=False,
         )
         monkeypatch.setattr("core.config.get_settings", lambda: settings)

@@ -113,7 +113,7 @@ o6p7q8r9s0t1 (v2.3 head)
 **开放 API** `api/public/v1/*`
 - `ApiKey` 增加 `scopes` / `rate_limit` / `expires_at`
 - `require_api_key(scopes=[...])` 依赖，真正 gate 端点
-- Python SDK（`sdk/python/agentvalue/`）+ TypeScript SDK（`sdk/typescript/`）
+- Python SDK（`sdk/python/humanvalue/`）+ TypeScript SDK（`sdk/typescript/`）
 
 ### WS-4 企业级治理加固
 

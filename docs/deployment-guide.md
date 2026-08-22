@@ -292,7 +292,7 @@ server {
 | `JWT_ALGORITHM` | 否 | JWT 算法，默认 `HS256` |
 | `JWT_EXPIRE_MINUTES` | 否 | Token 有效期，默认 `1440` |
 | `AUTH_DEMO_MODE` | 否 | 演示模式，生产必须 `false` |
-| `AGENTVALUE_ENV` | 否 | 环境标识，设为 `production` 才触发 `demo_mode` 守护（生产必须设） |
+| `HUMANVALUE_ENV` | 否 | 环境标识，设为 `production` 才触发 `demo_mode` 守护（生产必须设） |
 | `LANGFUSE_PUBLIC_KEY` | 否 | Langfuse 公钥 |
 | `LANGFUSE_SECRET_KEY` | 否 | Langfuse 私钥 |
 | `LANGFUSE_HOST` | 否 | Langfuse 地址 |
@@ -331,17 +331,17 @@ curl -X POST http://localhost:8000/api/v1/auth/seed-demo-users
 
 | 邮箱 | 角色 | 默认密码 |
 |---|---|---|
-| employee@humanvalue.ai | employee | agentvalue123 |
-| manager@humanvalue.ai | manager | agentvalue123 |
-| hr@humanvalue.ai | hr | agentvalue123 |
-| admin@humanvalue.ai | admin | agentvalue123 |
+| employee@humanvalue.ai | employee | humanvalue123 |
+| manager@humanvalue.ai | manager | humanvalue123 |
+| hr@humanvalue.ai | hr | humanvalue123 |
+| admin@humanvalue.ai | admin | humanvalue123 |
 
 > **安全说明（双层守护，生产环境接口天然不可达）：**
-> 1. `core/config.py` 的 `_enforce_prod_demo_mode_guard`：当 `AGENTVALUE_ENV=production` 且
+> 1. `core/config.py` 的 `_enforce_prod_demo_mode_guard`：当 `HUMANVALUE_ENV=production` 且
 >    `AUTH_DEMO_MODE=true` 时，硬拒绝 `Settings` 实例化（应用启动直接失败）；
 > 2. `api/auth_routes.py` 的 `seed_demo_users` 接口：未开启 `auth_demo_mode` 时返回 403。
 >
-> 因此生产环境无法调用此接口，无需手动删除。演示账号默认密码 `agentvalue123` 较弱，
+> 因此生产环境无法调用此接口，无需手动删除。演示账号默认密码 `humanvalue123` 较弱，
 > 仅供本地联调，正式环境请勿使用演示账号。
 
 ### 6.2 提交一条测试输入

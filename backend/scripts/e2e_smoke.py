@@ -24,13 +24,13 @@ from typing import Any, Callable, Optional
 import httpx
 
 DEFAULT_BASE_URL = "http://127.0.0.1:8000"
-DEMO_PASSWORD = "agentvalue123"
+DEMO_PASSWORD = "humanvalue123"
 
 ACCOUNTS = {
-    "employee": "employee@agentvalue.ai",
-    "manager": "manager@agentvalue.ai",
-    "hr": "hr@agentvalue.ai",
-    "admin": "admin@agentvalue.ai",
+    "employee": "employee@humanvalue.ai",
+    "manager": "manager@humanvalue.ai",
+    "hr": "hr@humanvalue.ai",
+    "admin": "admin@humanvalue.ai",
 }
 
 

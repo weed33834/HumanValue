@@ -116,7 +116,7 @@ def employee_token(client):
     client.post("/api/v1/auth/seed-demo-users")
     resp = client.post(
         "/api/v1/auth/login",
-        json={"email": "employee@humanvalue.ai", "password": "agentvalue123"},
+        json={"email": "employee@humanvalue.ai", "password": "humanvalue123"},
     )
     assert resp.status_code == 200
     return resp.json()["access_token"]
@@ -127,7 +127,7 @@ def manager_token(client):
     """登录主管账号"""
     resp = client.post(
         "/api/v1/auth/login",
-        json={"email": "manager@humanvalue.ai", "password": "agentvalue123"},
+        json={"email": "manager@humanvalue.ai", "password": "humanvalue123"},
     )
     assert resp.status_code == 200
     return resp.json()["access_token"]
@@ -138,7 +138,7 @@ def hr_token(client):
     """登录 HR 账号"""
     resp = client.post(
         "/api/v1/auth/login",
-        json={"email": "hr@humanvalue.ai", "password": "agentvalue123"},
+        json={"email": "hr@humanvalue.ai", "password": "humanvalue123"},
     )
     assert resp.status_code == 200
     return resp.json()["access_token"]

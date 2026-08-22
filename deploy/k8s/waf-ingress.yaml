@@ -29,16 +29,16 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: waf-modsecurity-rules
-  namespace: agentvalue
+  namespace: humanvalue
   labels:
-    app.kubernetes.io/name: agentvalue-waf
+    app.kubernetes.io/name: humanvalue-waf
     app.kubernetes.io/component: security
 data:
   # ModSecurity 自定义规则 — 针对 HumanValue 业务场景的补充规则
   # OWASP CRS 已覆盖通用攻击(SQL注入/XSS/路径遍历等),此处补充业务特定规则
 
   # 规则1: 禁止访问敏感路径(.env/.git/.svn/credentials)
-  agentvalue-custom-rules.conf: |
+  humanvalue-custom-rules.conf: |
     # 禁止访问敏感文件路径
     SecRule REQUEST_URI "@rx /\.(env|git|svn|hg|credentials|aws|ssh)" \
       "id:1001,phase:1,deny,status:403,msg:'Access to sensitive file detected',severity:CRITICAL,log"
@@ -100,12 +100,12 @@ data:
         "msg:'Unsupported Content-Type'"
 
 ---
-# NetworkPolicy 补充: 限制 WAF Ingress Controller 只能访问 agentvalue 命名空间
+# NetworkPolicy 补充: 限制 WAF Ingress Controller 只能访问 humanvalue 命名空间
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
   name: waf-egress-policy
-  namespace: agentvalue
+  namespace: humanvalue
 spec:
   podSelector:
     matchLabels:
@@ -122,11 +122,11 @@ spec:
           port: 53
         - protocol: TCP
           port: 53
-    # 允许访问 agentvalue 命名空间内的 Pod
+    # 允许访问 humanvalue 命名空间内的 Pod
     - to:
         - namespaceSelector:
             matchLabels:
-              kubernetes.io/metadata.name: agentvalue
+              kubernetes.io/metadata.name: humanvalue
     # 允许访问 Kubernetes API
     - to:
         - namespaceSelector: {}

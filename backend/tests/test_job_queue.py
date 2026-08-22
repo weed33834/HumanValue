@@ -166,12 +166,12 @@ async def test_redis_clear(monkeypatch):
 
 
 async def test_redis_key_prefix(monkeypatch):
-    """确认 key 带前缀 agentvalue:job:"""
+    """确认 key 带前缀 humanvalue:job:"""
     q = _make_fake_redis_queue(monkeypatch)
     await q.enqueue("job-1", _job())
     # 直接读底层数据,验证 key 命名
-    keys = await q._client.keys("agentvalue:job:*")
-    assert keys == ["agentvalue:job:job-1"]
+    keys = await q._client.keys("humanvalue:job:*")
+    assert keys == ["humanvalue:job:job-1"]
 
 
 async def test_redis_operation_failure_does_not_raise(monkeypatch):

@@ -11,9 +11,9 @@ services:
       - DATABASE_URL=sqlite+aiosqlite:///./dbdata/humanvalue.db
       - VECTOR_STORE_DIR=/app/chroma_db
       - ATTACHMENT_DIR=/app/attachments
-      # 安全默认值（生产环境请通过 .env 覆盖 JWT_SECRET_KEY 与 AGENTVALUE_ENV）
+      # 安全默认值（生产环境请通过 .env 覆盖 JWT_SECRET_KEY 与 HUMANVALUE_ENV）
       # JWT_SECRET_KEY 在开发模式下提供占位值,使开箱即用的 docker compose 可正常签发 token;
-      # 生产部署必须通过 ./backend/.env 覆盖为强随机值,并设 AGENTVALUE_ENV=production
+      # 生产部署必须通过 ./backend/.env 覆盖为强随机值,并设 HUMANVALUE_ENV=production
       - JWT_SECRET_KEY=${JWT_SECRET_KEY:-dev-only-please-change-me-32chars-or-more}
       - AUTH_DEMO_MODE=false
       - DEBUG=false

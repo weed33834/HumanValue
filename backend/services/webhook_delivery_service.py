@@ -603,7 +603,7 @@ async def deliver(delivery_id: int) -> Dict[str, Any]:
         }
         for key, value in extra_headers.items():
             # 自定义头不允许覆盖签名相关头, 防止订阅配置削弱安全性
-            if str(key).lower().startswith("x-agentvalue-"):
+            if str(key).lower().startswith("x-humanvalue-"):
                 continue
             headers[str(key)] = str(value)
 

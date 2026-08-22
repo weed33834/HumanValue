@@ -7,7 +7,7 @@
 
 ## 上下文
 
-Phase 6.1 把 `api/routes.py` 的模块级 `job_store: Dict` 抽成了 `JobQueue`,提供 InMemory(测试/本地)与 Redis(多实例生产)两套实现,解除了"评估任务状态只能单实例可见"的约束。但当前 `RedisJobQueue` 的实现是**裸 `redis.asyncio`**:把每个 job 序列化成 JSON 存到 `agentvalue:job:{job_id}` 这个 key,本质是**共享状态存储**,不是真正的任务队列——没有独立 worker、没有消费组、没有失败重投。
+Phase 6.1 把 `api/routes.py` 的模块级 `job_store: Dict` 抽成了 `JobQueue`,提供 InMemory(测试/本地)与 Redis(多实例生产)两套实现,解除了"评估任务状态只能单实例可见"的约束。但当前 `RedisJobQueue` 的实现是**裸 `redis.asyncio`**:把每个 job 序列化成 JSON 存到 `humanvalue:job:{job_id}` 这个 key,本质是**共享状态存储**,不是真正的任务队列——没有独立 worker、没有消费组、没有失败重投。
 
 这埋着一个隐患:评估任务由创建它的那个 API 进程在后台跑(`BackgroundTasks`),进程崩了任务就卡死,pending/running 状态烂在 Redis 里没人接手。单实例下不是问题,但规模化部署(见 [scale-deployment-runbook.md](../scale-deployment-runbook.md))按租户隔离多实例后,这个隐患会浮现。
 
@@ -45,9 +45,9 @@ Phase 6.1 把 `api/routes.py` 的模块级 `job_store: Dict` 抽成了 `JobQueue
 
 切换 arq 时不改 `JobQueue` 抽象语义,只加实现:
 
-1. 新增 `core/job_queue_arq.py`,`ArqJobQueue` 实现 `JobQueue` 接口;`enqueue` 调 `pool.enqueue_job`,`get`/`update` 仍读写 `agentvalue:job:{job_id}`(结果状态仍走 Redis key,与 arq 结果后端并存,迁移期可对账)。
+1. 新增 `core/job_queue_arq.py`,`ArqJobQueue` 实现 `JobQueue` 接口;`enqueue` 调 `pool.enqueue_job`,`get`/`update` 仍读写 `humanvalue:job:{job_id}`(结果状态仍走 Redis key,与 arq 结果后端并存,迁移期可对账)。
 2. 评估的真正执行函数(当前在 `BackgroundTasks` 里跑的那段)抽成 `async def evaluate_job(ctx, job_id)`,注册成 arq task。
-3. `create_job_queue` 工厂加分支:`AGENTVALUE_JOB_BACKEND=arq` 且 Redis 可达时返回 `ArqJobQueue`,否则保持现有逻辑。
+3. `create_job_queue` 工厂加分支:`HUMANVALUE_JOB_BACKEND=arq` 且 Redis 可达时返回 `ArqJobQueue`,否则保持现有逻辑。
 4. `docker-compose.prod.yml` 加 `arq-worker` 服务,`command: arq worker.WorkerSettings`。
 5. 灰度:先在试点的一个租户开 arq,观察任务完成率 / 失败重投 / worker 内存一周,无回归再全量。
 

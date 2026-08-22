@@ -2,7 +2,7 @@
 # PostgreSQL StatefulSet + Service(单副本)+ 持久化
 # -----------------------------------------------------------------------------
 # 镜像: postgres:15-alpine   端口: 5432   副本: 1
-# 凭据来自 agentvalue-secret(POSTGRES_USER/PASSWORD/DB)。
+# 凭据来自 humanvalue-secret(POSTGRES_USER/PASSWORD/DB)。
 # 数据持久化: volumeClaimTemplates 自动创建 PVC postgres-data-postgres-0,
 #   PV 由集群默认 StorageClass 动态提供(minikube/kind/云盘均内置动态供应)。
 #   若集群无动态 StorageClass,请创建匹配的 PersistentVolume,或指定 storageClassName。
@@ -17,26 +17,26 @@
 #   capacity: { storage: 10Gi }
 #   accessModes: ["ReadWriteOnce"]
 #   persistentVolumeReclaimPolicy: Retain
-#   hostPath: { path: /data/agentvalue/postgres }   # 单节点本地开发用,生产换云盘
+#   hostPath: { path: /data/humanvalue/postgres }   # 单节点本地开发用,生产换云盘
 # =============================================================================
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: postgres
   labels:
-    app.kubernetes.io/name: agentvalue
+    app.kubernetes.io/name: humanvalue
     app.kubernetes.io/component: postgres
 spec:
   serviceName: postgres
   replicas: 1
   selector:
     matchLabels:
-      app.kubernetes.io/name: agentvalue
+      app.kubernetes.io/name: humanvalue
       app.kubernetes.io/component: postgres
   template:
     metadata:
       labels:
-        app.kubernetes.io/name: agentvalue
+        app.kubernetes.io/name: humanvalue
         app.kubernetes.io/component: postgres
     spec:
       # 优雅终止:等待连接排空,避免数据损坏
@@ -49,17 +49,17 @@ spec:
             - name: POSTGRES_USER
               valueFrom:
                 secretKeyRef:
-                  name: agentvalue-secret
+                  name: humanvalue-secret
                   key: POSTGRES_USER
             - name: POSTGRES_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: agentvalue-secret
+                  name: humanvalue-secret
                   key: POSTGRES_PASSWORD
             - name: POSTGRES_DB
               valueFrom:
                 secretKeyRef:
-                  name: agentvalue-secret
+                  name: humanvalue-secret
                   key: POSTGRES_DB
           ports:
             - name: postgres
@@ -94,7 +94,7 @@ spec:
     - metadata:
         name: postgres-data
         labels:
-          app.kubernetes.io/name: agentvalue
+          app.kubernetes.io/name: humanvalue
           app.kubernetes.io/component: postgres
       spec:
         accessModes: ["ReadWriteOnce"]
@@ -108,12 +108,12 @@ kind: Service
 metadata:
   name: postgres
   labels:
-    app.kubernetes.io/name: agentvalue
+    app.kubernetes.io/name: humanvalue
     app.kubernetes.io/component: postgres
 spec:
   type: ClusterIP
   selector:
-    app.kubernetes.io/name: agentvalue
+    app.kubernetes.io/name: humanvalue
     app.kubernetes.io/component: postgres
   ports:
     - name: postgres

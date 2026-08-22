@@ -64,7 +64,7 @@ class EmbeddingClient:
 
     # ── ChromaDB 1.x EmbeddingFunction 协议 ──────────────────────────
     def name(self) -> str:
-        return "agentvalue_openai_compatible"
+        return "humanvalue_openai_compatible"
 
     def is_legacy(self) -> bool:
         return False

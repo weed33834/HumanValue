@@ -21,7 +21,7 @@
 
     # 环境变量:
     OTEL_EXPORTER_OTLP_ENDPOINT=http://jaeger:4317
-    OTEL_SERVICE_NAME=agentvalue-backend
+    OTEL_SERVICE_NAME=humanvalue-backend
 """
 
 from __future__ import annotations
@@ -346,7 +346,7 @@ def setup_tracing(app: Any, engine: Any = None) -> bool:
         logger.info("OTEL_EXPORTER_OTLP_ENDPOINT 未配置,跳过分布式追踪")
         return False
 
-    service_name = os.environ.get("OTEL_SERVICE_NAME", "agentvalue-backend")
+    service_name = os.environ.get("OTEL_SERVICE_NAME", "humanvalue-backend")
 
     # 创建 TracerProvider
     resource = Resource.create(

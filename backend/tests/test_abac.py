@@ -11,7 +11,7 @@ ABAC 权限引擎测试 (P1-7: 属性级访问控制)
 - 用户组管理 API (CRUD / 成员管理 / 组策略)
 
 运行:
-    cd /workspace/agentvalue/backend && python -m pytest tests/test_abac.py -v
+    cd /workspace/humanvalue/backend && python -m pytest tests/test_abac.py -v
 """
 
 import asyncio
