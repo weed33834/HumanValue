@@ -452,7 +452,7 @@ def build_langchain_tool(tool_spec: ToolSpec, auth: Optional[AuthConfig] = None)
         try:
             # SSRF 防护
             if _is_internal_url(rendered_url):
-                return f"工具调用失败: 不允许访问内部地址"
+                return "工具调用失败: 不允许访问内部地址"
             with httpx.Client(timeout=30.0) as client:
                 resp = client.request(
                     method,
@@ -493,7 +493,7 @@ def build_langchain_tool(tool_spec: ToolSpec, auth: Optional[AuthConfig] = None)
         try:
             # SSRF 防护
             if _is_internal_url(rendered_url):
-                return f"工具调用失败: 不允许访问内部地址"
+                return "工具调用失败: 不允许访问内部地址"
             async with httpx.AsyncClient(timeout=30.0) as client:
                 resp = await client.request(
                     method,

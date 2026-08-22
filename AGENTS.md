@@ -98,3 +98,12 @@ npm run lint && npm test && npm run build
 | docs/alerting-rules.md | 监控告警指标清单（humanvalue_* 指标） |
 | docs/error-codes.md | 统一错误码 |
 | docs/pilot-runbook.md | 试点上线手册 |
+
+## 10. 质量基线与爬坡路线（2026-08-22 审计后确立）
+
+- 实测覆盖率 **60.94%**（59,747 语句），CI 门禁已提至 `--cov-fail-under=60`。
+- 目标 70%：只允许随真实测试逐 PR 爬坡（门禁跟随实测值上调），
+  禁止用降低断言强度/跳过用例的方式凑数——那是另一种虚假实现。
+- 缺口集中区：agent 工具链（editor/file_tools/git_integration 等 0-8%）、
+  graph_rag/hybrid_search 服务、api/routes.py 主路由。补测优先选纯逻辑模块。
+- ruff 已强制 F401/F841/F541（v1.0.9 归零）；E741/F402 暂豁免，专项治理后启用。

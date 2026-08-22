@@ -17,7 +17,6 @@ LangChain 为可选依赖, 未安装时降级返回 None (不阻断主流程)。
 
 from __future__ import annotations
 
-import json
 import logging
 import os
 import re

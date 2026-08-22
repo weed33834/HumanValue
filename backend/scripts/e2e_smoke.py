@@ -19,7 +19,7 @@ import json
 import sys
 import time
 from dataclasses import dataclass, field, asdict
-from typing import Any, Callable, Optional
+from typing import Callable, Optional
 
 import httpx
 

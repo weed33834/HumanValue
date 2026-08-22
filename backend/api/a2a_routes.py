@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-from fastapi import APIRouter
 
 from agent.a2a_server import create_a2a_router
 

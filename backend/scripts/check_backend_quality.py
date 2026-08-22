@@ -81,13 +81,6 @@ def check_route_signatures() -> None:
         for node in ast.walk(tree):
             if not isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
                 continue
-            # 是否是路由处理函数: 上方有 @router.* 装饰器
-            is_route = any(
-                isinstance(d, ast.Call)
-                and isinstance(d.func, ast.Attribute)
-                and d.func.attr in ("get", "post", "put", "delete", "patch")
-                for d in node.decorator_list
-            )
             has_rate_limit = any(
                 isinstance(d, ast.Call)
                 and isinstance(d.func, ast.Name)

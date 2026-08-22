@@ -285,10 +285,8 @@ def _load_control_tools() -> List[Any]:
         Args:
             email: 被锁定的邮箱
         """
-        from services.enterprise_service import LoginGuardService
 
         async def _do(session):
-            svc = LoginGuardService(session)
             from sqlalchemy import delete as sa_delete
             from models.enterprise_models import LoginAttempt
             from core.tenant_context import get_current_tenant

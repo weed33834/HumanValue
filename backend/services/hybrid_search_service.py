@@ -790,7 +790,7 @@ class HybridSearchService:
                 await asyncio.to_thread(collection.delete, ids=ids)
             return len(ids)
         except Exception as e:
-            logger.warning("删除段落 %s chunk 失败: {e}", paragraph_index)
+            logger.warning("删除段落 %s chunk 失败: %s", paragraph_index, e)
             return 0
 
     async def _update_paragraph_index(
@@ -830,7 +830,9 @@ class HybridSearchService:
                 new_id = f"{document_id}__p{new_index}__c{i}"
                 await self._upsert_chunk(collection, new_id, doc, meta)
         except Exception as e:
-            logger.warning("更新段落索引 %s→{new_index} 失败: {e}", old_index)
+            # 历史实现此处 {new_index} 为未插值字面量; 异常时目标索引可能尚未赋值,
+            # 故仅记录来源索引与异常
+            logger.warning("更新段落索引 %s 失败: %s", old_index, e)
 
     async def _index_paragraphs(
         self,
@@ -1023,7 +1025,7 @@ class HybridSearchService:
                 kwargs["embedding_function"] = embedding
             return client.get_or_create_collection(**kwargs)
         except Exception as e:
-            logger.warning("获取 collection %s 失败: {e}", collection_name)
+            logger.warning("获取 collection %s 失败: %s", collection_name, e)
             return current_collection
 
     # --------------------------------------------------------

@@ -10,7 +10,7 @@ import threading
 import time
 from collections import OrderedDict
 from dataclasses import dataclass
-from typing import Any, Callable, Dict, List, Optional, Tuple
+from typing import Any, Callable, Dict, List, Optional
 
 logger = logging.getLogger(__name__)
 
@@ -139,7 +139,6 @@ class LLMResponseCache:
             return n
 
     async def stats(self) -> Dict[str, Any]:
-        now = time.time()
         with self._lock:
             total = self.hits + self.misses
             return {

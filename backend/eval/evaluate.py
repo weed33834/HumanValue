@@ -15,7 +15,6 @@ LLM 输出回归评估脚本
 import argparse
 import asyncio
 import json
-import re
 import sys
 from pathlib import Path
 from typing import Any, Dict, List, Tuple
@@ -30,9 +29,6 @@ from agent.tools import AgentToolkit, DummyCompanyKB, DummyMemoryStore
 from core.config import Settings
 from core.model_router import ModelRouter
 from core.providers.base import (
-    BaseProvider,
-    ChatCompletion,
-    ChatMessage,
     ProviderConfig,
 )
 from eval.constants import NEGATIVE_WORDS
@@ -81,11 +77,12 @@ def load_dataset(path: str = None) -> List[Dict[str, Any]]:
 
 # MockProvider / build_mock_evaluation 已提升为 core.providers 的一等公民，
 # 使运行中的 HTTP 服务（LLM_MOCK_MODE=true）与本离线评测脚本共用同一份实现，
-# 避免两处 Mock 行为漂移。此处重新导出以保持既有导入路径向后兼容。
+# 避免两处 Mock 行为漂移。此处重新导出以保持既有导入路径向后兼容
+# (build_mock_evaluation 仅被测试套件消费,故标 noqa 保留 re-export)。
 from core.providers.mock_provider import (  # noqa: E402
     MockProvider,
-    build_mock_evaluation,
 )
+from core.providers.mock_provider import build_mock_evaluation  # noqa: F401,E402
 
 
 def check_employee_view_no_negative_words(eval_result: dict) -> Tuple[bool, str]:

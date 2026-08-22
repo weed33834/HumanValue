@@ -8,7 +8,7 @@ from typing import Any, Dict, List, Optional
 from fastapi import APIRouter, Depends, HTTPException, Request
 from pydantic import BaseModel, ConfigDict, Field
 
-from api.deps import get_audit_service, get_db, get_pipeline_service
+from api.deps import get_audit_service, get_pipeline_service
 from auth.rbac import Role, get_current_user_id, require_role
 from core.rate_limit import rate_limit
 from services.audit_service import AuditService

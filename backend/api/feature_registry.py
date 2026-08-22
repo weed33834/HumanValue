@@ -23,7 +23,7 @@ from __future__ import annotations
 import importlib
 import logging
 from dataclasses import dataclass, field
-from typing import List, Optional
+from typing import List
 
 from fastapi import FastAPI
 

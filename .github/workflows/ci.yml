@@ -62,7 +62,7 @@ jobs:
         run: |
           python -m pytest -x -q --tb=short \
             --cov=. --cov-report=term-missing --cov-report=xml \
-            --cov-fail-under=50 \
+            --cov-fail-under=60 \
             --ignore=tests/perf
 
   # P1-4: 数据库迁移往返测试(upgrade → downgrade → upgrade)
