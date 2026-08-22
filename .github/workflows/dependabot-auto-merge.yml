@@ -20,19 +20,20 @@ jobs:
         uses: dependabot/fetch-metadata@v3
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
+      # 仅自动合并 patch 版本: minor 更新可能携带行为变更甚至投毒,
+      # 必须经过人工审查; 且合并前提是"已注册的检查全部通过",
+      # 检查尚未注册时一律等待而不是直接合并。
       - name: Wait for CI checks and merge
-        if: |
-          steps.metadata.outputs.update-type == 'version-update:semver-patch' ||
-          steps.metadata.outputs.update-type == 'version-update:semver-minor'
+        if: steps.metadata.outputs.update-type == 'version-update:semver-patch'
         run: |
-          sleep 15  # let CI workflows register their checks
+          sleep 60  # let CI workflows register their checks
           for i in $(seq 1 80); do
             STATES=$(gh pr checks "$PR_URL" --json name,state --jq 'map(select(.name | test("auto-merge") | not)) | [.[].state]' 2>/dev/null || echo '[]')
             TOTAL=$(echo "$STATES" | jq 'length')
             if [ "$TOTAL" -eq 0 ]; then
-              echo "No other checks — merging directly."
-              gh pr merge --squash "$PR_URL"
-              exit 0
+              echo "No checks registered yet — waiting ($i/80), will NOT merge blind."
+              sleep 30
+              continue
             fi
             if echo "$STATES" | grep -qE "FAILURE|CANCELLED|TIMED_OUT|ACTION_REQUIRED"; then
               echo "A check failed — not merging."
@@ -47,7 +48,7 @@ jobs:
             echo "Waiting for checks... ($i/80)"
             sleep 30
           done
-          echo "Timed out waiting for checks."
+          echo "Timed out waiting for checks — NOT merging."
         env:
           PR_URL: ${{ github.event.pull_request.html_url }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
