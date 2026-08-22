@@ -1,0 +1,51 @@
+# 镜像同步: GitHub(主) → GitCode / Gitee
+# 前置条件: 仓库 Secrets 中配置 GITCODE_KEY 与 GITEE_TOKEN (缺哪个跳哪个,不报错)
+# 说明: 强制推送以保持镜像与主库历史一致;仅同步 main 分支
+name: Sync Mirrors
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: sync-mirrors
+  cancel-in-progress: false
+
+jobs:
+  gitcode:
+    name: GitCode Mirror
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - name: Force-push main to GitCode
+        env:
+          KEY: ${{ secrets.GITCODE_KEY }}
+        run: |
+          if [ -z "$KEY" ]; then
+            echo "::notice::GITCODE_KEY 未配置,跳过 GitCode 同步"
+            exit 0
+          fi
+          git push --force "https://badhope:${KEY}@gitcode.com/badhope/HumanValue.git" "HEAD:refs/heads/main"
+
+  gitee:
+    name: Gitee Mirror
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - name: Force-push main to Gitee
+        env:
+          TOKEN: ${{ secrets.GITEE_TOKEN }}
+        run: |
+          if [ -z "$TOKEN" ]; then
+            echo "::notice::GITEE_TOKEN 未配置,跳过 Gitee 同步"
+            exit 0
+          fi
+          git push --force "https://badhope:${TOKEN}@gitee.com/badhope/HumanValue.git" "HEAD:refs/heads/main"
