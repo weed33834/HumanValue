@@ -16,7 +16,7 @@
   <img src="https://img.shields.io/badge/FastAPI-0.139+-009688?logo=fastapi&logoColor=white" alt="FastAPI" />
   <img src="https://img.shields.io/badge/Vue_3-4FC08D?logo=vuedotjs&logoColor=white" alt="Vue 3" />
   <img src="https://img.shields.io/badge/LangGraph-agent-FF6B6B" alt="LangGraph" />
-  <a href="CHANGELOG.md"><img src="https://img.shields.io/badge/version-1.0.0-blue.svg" alt="Version 1.0.0" /></a>
+  <a href="CHANGELOG.md"><img src="https://img.shields.io/badge/version-1.0.1-blue.svg" alt="Version 1.0.1" /></a>
 </p>
 
 <p align="center">
@@ -67,7 +67,7 @@
 ### Docker Compose (recommended)
 
 ```bash
-git clone https://gitcode.com/badhope/HumanValue.git
+git clone https://github.com/weed33834/HumanValue.git
 cd HumanValue
 cp backend/.env.example backend/.env   # set JWT_SECRET_KEY and a model API key
 docker compose up -d --build
@@ -114,8 +114,8 @@ See the [Demo Showcase](docs/demo-showcase.md) for the complete recorded walkthr
 
 | Platform | URL |
 |---|---|
-| GitCode (primary) | https://gitcode.com/badhope/HumanValue |
-| GitHub (mirror) | https://github.com/weed33834/HumanValue |
+| GitHub (primary) | https://github.com/weed33834/HumanValue |
+| GitCode (mirror) | https://gitcode.com/badhope/HumanValue |
 | Gitee (mirror) | https://gitee.com/badhope/HumanValue |
 
 ## License

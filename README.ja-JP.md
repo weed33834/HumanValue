@@ -15,7 +15,7 @@
   <img src="https://img.shields.io/badge/Node-20+-339933?logo=nodedotjs&logoColor=white" alt="Node 20+" />
   <img src="https://img.shields.io/badge/FastAPI-0.139+-009688?logo=fastapi&logoColor=white" alt="FastAPI" />
   <img src="https://img.shields.io/badge/Vue_3-4FC08D?logo=vuedotjs&logoColor=white" alt="Vue 3" />
-  <a href="CHANGELOG.md"><img src="https://img.shields.io/badge/version-1.0.0-blue.svg" alt="バージョン 1.0.0" /></a>
+  <a href="CHANGELOG.md"><img src="https://img.shields.io/badge/version-1.0.1-blue.svg" alt="バージョン 1.0.1" /></a>
 </p>
 
 <p align="center">
@@ -53,7 +53,7 @@
 ## クイックスタート
 
 ```bash
-git clone https://gitcode.com/badhope/HumanValue.git
+git clone https://github.com/weed33834/HumanValue.git
 cd HumanValue
 cp backend/.env.example backend/.env
 docker compose up -d --build
@@ -73,9 +73,9 @@ docker compose up -d --build
 
 | プラットフォーム | URL |
 |---|---|
-| GitCode | https://gitcode.com/badhope/HumanValue |
-| GitHub | https://github.com/weed33834/HumanValue |
-| Gitee | https://gitee.com/badhope/HumanValue |
+| GitHub（主） | https://github.com/weed33834/HumanValue |
+| GitCode（ミラー） | https://gitcode.com/badhope/HumanValue |
+| Gitee（ミラー） | https://gitee.com/badhope/HumanValue |
 
 ## ライセンス
 
