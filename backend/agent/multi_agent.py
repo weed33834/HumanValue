@@ -215,6 +215,9 @@ REPORT_WRITER_PROMPT = """你是报告生成专家。汇总各 Agent 的 artifac
 # 此处以旧名称导入,调用点无需改动
 from agent._json_util import call_llm_json as _call_llm_json  # noqa: E402
 
+# _safe_json_parse 仅被测试套件以旧路径导入,保留 re-export(noqa 防 F401 误删)
+from agent._json_util import safe_json_parse as _safe_json_parse  # noqa: F401,E402
+
 
 def _append_timeline(state: dict, node: str, status: str = "ok", **extra: Any) -> list:
     """追加节点执行记录到 timeline, 便于前端时间线可视化"""
