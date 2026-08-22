@@ -19,7 +19,7 @@ from typing import Any, Dict, List, Optional
 from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from core.database import AsyncSessionLocal
+from services._base import OwnedSessionMixin
 from models.quota_models import (
     DEFAULT_MAX_API_KEYS,
     DEFAULT_MAX_REQUESTS_PER_DAY,
@@ -38,7 +38,7 @@ _DEFAULT_QUOTA = {
 }
 
 
-class QuotaService:
+class QuotaService(OwnedSessionMixin):
     """配额管理服务
 
     支持两种使用模式:
@@ -50,26 +50,6 @@ class QuotaService:
         self._session = session
         # 标记是否由本服务管理 session（需自行 commit/close）
         self._owns_session = session is None
-
-    async def _get_session(self) -> AsyncSession:
-        """获取或创建数据库会话"""
-        if self._session is not None:
-            return self._session
-        # 中间件/后台调用时自建会话
-        self._session = AsyncSessionLocal()
-        self._owns_session = True
-        return self._session
-
-    async def _commit_if_owned(self) -> None:
-        """如果 session 由本服务创建，则自动 commit"""
-        if self._owns_session and self._session is not None:
-            await self._session.commit()
-
-    async def _close_if_owned(self) -> None:
-        """如果 session 由本服务创建，则自动关闭"""
-        if self._owns_session and self._session is not None:
-            await self._session.close()
-            self._session = None
 
     async def _get_or_create_quota(
         self, session: AsyncSession, tenant_id: str

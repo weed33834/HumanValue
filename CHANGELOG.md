@@ -3,6 +3,19 @@
 本文件记录 HumanValue 所有显著变更,格式遵循 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/),
 版本号遵循 [语义化版本](https://semver.org/lang/zh-CN/)。
 
+## [v1.0.11] - 2026-08-22
+
+### 重复造轮子收尾: 会话所有权三件套收口
+
+- 新增 `services/_base.py::OwnedSessionMixin`: 统一 `_get_session /
+  _commit_if_owned / _close_if_owned` 三件套(此前在 billing/budget/api_health/
+  analytics_v2/model_fallback/model_load_balancer/quota/kb_sync/prompt_optimization
+  九个 service 各持一份逐字拷贝)。
+- 九个 service 改为继承 mixin,删除各自的重复实现;子类 __init__ 保持各自签名不变。
+- 净删约 152 行;multi_tenant/governance 等 39 个相关测试通过
+  (governance_v3 中 2 个沙箱用例依赖 Unix-only `resource` 模块,本地 Windows 无法执行,
+  与本变更无关,以 CI 为准)。
+
 ## [v1.0.10] - 2026-08-22
 
 ### 全量审计收尾: 文档核查
