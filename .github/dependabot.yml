@@ -1,4 +1,5 @@
-# Dependabot 配置 — 启用自动版本更新 PR 与 auto-merge
+# Dependabot 配置 — 版本更新 PR 由 dependabot-auto-merge.yml 工作流负责自动合并
+# (Dependabot 配置 schema 无 auto-merge 键,自动合并统一由 workflow 实现)
 version: 2
 updates:
   # Python 依赖
@@ -6,30 +7,22 @@ updates:
     directory: "/backend"
     schedule:
       interval: "monthly"
-    auto-merge:
-      enabled: true
     open-pull-requests-limit: 5
   # npm 依赖
   - package-ecosystem: "npm"
     directory: "/frontend"
     schedule:
       interval: "monthly"
-    auto-merge:
-      enabled: true
     open-pull-requests-limit: 5
   # GitHub Actions
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
       interval: "monthly"
-    auto-merge:
-      enabled: true
     open-pull-requests-limit: 5
   # Docker
   - package-ecosystem: "docker"
     directory: "/backend"
     schedule:
       interval: "monthly"
-    auto-merge:
-      enabled: true
     open-pull-requests-limit: 5
