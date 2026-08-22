@@ -15,7 +15,7 @@
   <img src="https://img.shields.io/badge/Node-20+-339933?logo=nodedotjs&logoColor=white" alt="Node 20+" />
   <img src="https://img.shields.io/badge/FastAPI-0.139+-009688?logo=fastapi&logoColor=white" alt="FastAPI" />
   <img src="https://img.shields.io/badge/Vue_3-4FC08D?logo=vuedotjs&logoColor=white" alt="Vue 3" />
-  <a href="CHANGELOG.md"><img src="https://img.shields.io/badge/version-1.0.3-blue.svg" alt="バージョン 1.0.3" /></a>
+  <a href="CHANGELOG.md"><img src="https://img.shields.io/badge/version-1.0.4-blue.svg" alt="バージョン 1.0.4" /></a>
 </p>
 
 <p align="center">
@@ -68,6 +68,8 @@ docker compose up -d --build
 | [チャットコンソール](docs/chat-console.md) | チャットでの操作ガイド |
 | [ショートカット](docs/shortcuts.md) | ショートカットとヒント |
 | [エラーコード](docs/error-codes.md) | エラーコードハンドブック |
+| [導入ガイド](docs/adoption-enterprise-academia.md) | 企業・大学向け段階的導入 |
+| [コンプライアンス](docs/compliance-employee-rights.md) | PIPL/GDPR 自動意思決定対応 |
 
 ## リポジトリ
 

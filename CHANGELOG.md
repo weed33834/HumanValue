@@ -3,6 +3,18 @@
 本文件记录 HumanValue 所有显著变更,格式遵循 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/),
 版本号遵循 [语义化版本](https://semver.org/lang/zh-CN/)。
 
+## [v1.0.4] - 2026-08-22
+
+### 产品落地: 企业/高校方案 + 员工权利合规
+
+- **新增 `docs/adoption-enterprise-academia.md`**: 企业与高校双场景画像(体系类型映射)、
+  角色功能地图、P0-P3 分阶段落地路线、集成清单(SSO/飞书/GitLab/本地大模型)、KPI 与常见坑。
+- **新增 `docs/compliance-employee-rights.md`**: PIPL 第24条 / GDPR 第22条 / EU AI Act
+  自动化决策合规指引;盘点平台内置合规能力(审批流人工复核、RBAC/ABAC、字段加密、
+  数据保留、审计日志、公平性审计、GDPR 审计);部署方 Go-Live 义务清单与反模式。
+- 三语 README 文档表新增两篇链接。
+- 定位澄清: 平台以"辅助决策"姿态服务企业与高校,处置类结论必须经人工审批闭环。
+
 ## [v1.0.3] - 2026-08-22
 
 ### CI 加固与协作规范重写
