@@ -25,13 +25,14 @@ from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.database import AsyncSessionLocal
+from services._base import OwnedSessionMixin
 from core.tenant_context import tenant_scope
 from models.kb_sync_models import KbDataSource, KbSyncLog
 
 logger = logging.getLogger(__name__)
 
 
-class KbSyncService:
+class KbSyncService(OwnedSessionMixin):
     """知识库自动同步服务
 
     支持两种使用模式:
@@ -42,22 +43,6 @@ class KbSyncService:
     def __init__(self, session: Optional[AsyncSession] = None):
         self._session = session
         self._owns_session = session is None
-
-    async def _get_session(self) -> AsyncSession:
-        if self._session is not None:
-            return self._session
-        self._session = AsyncSessionLocal()
-        self._owns_session = True
-        return self._session
-
-    async def _commit_if_owned(self) -> None:
-        if self._owns_session and self._session is not None:
-            await self._session.commit()
-
-    async def _close_if_owned(self) -> None:
-        if self._owns_session and self._session is not None:
-            await self._session.close()
-            self._session = None
 
     # ============================================================
     # 数据源 CRUD

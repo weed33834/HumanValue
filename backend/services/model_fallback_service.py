@@ -18,14 +18,14 @@ from typing import Any, Dict, List, Optional
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from core.database import AsyncSessionLocal
+from services._base import OwnedSessionMixin
 from core.tenant_context import get_current_tenant
 from models.model_fallback import FallbackChain
 
 logger = logging.getLogger(__name__)
 
 
-class ModelFallbackService:
+class ModelFallbackService(OwnedSessionMixin):
     """模型 Fallback 策略服务
 
     支持两种使用模式:
@@ -36,22 +36,6 @@ class ModelFallbackService:
     def __init__(self, session: Optional[AsyncSession] = None):
         self._session = session
         self._owns_session = session is None
-
-    async def _get_session(self) -> AsyncSession:
-        if self._session is not None:
-            return self._session
-        self._session = AsyncSessionLocal()
-        self._owns_session = True
-        return self._session
-
-    async def _commit_if_owned(self) -> None:
-        if self._owns_session and self._session is not None:
-            await self._session.commit()
-
-    async def _close_if_owned(self) -> None:
-        if self._owns_session and self._session is not None:
-            await self._session.close()
-            self._session = None
 
     # ============================================================
     # Fallback 执行

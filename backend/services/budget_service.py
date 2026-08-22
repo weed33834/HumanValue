@@ -20,7 +20,7 @@ from typing import Any, Dict, List, Optional
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from core.database import AsyncSessionLocal
+from services._base import OwnedSessionMixin
 from models.models import User
 from models.quota_models import BudgetAlert
 from services.notification_service import NotificationService
@@ -31,7 +31,7 @@ logger = logging.getLogger(__name__)
 BUDGET_TYPES = {"monthly", "daily"}
 
 
-class BudgetService:
+class BudgetService(OwnedSessionMixin):
     """成本预算告警服务
 
     支持两种使用模式:
@@ -42,25 +42,6 @@ class BudgetService:
     def __init__(self, session: Optional[AsyncSession] = None):
         self._session = session
         self._owns_session = session is None
-
-    async def _get_session(self) -> AsyncSession:
-        """获取或创建数据库会话"""
-        if self._session is not None:
-            return self._session
-        self._session = AsyncSessionLocal()
-        self._owns_session = True
-        return self._session
-
-    async def _commit_if_owned(self) -> None:
-        """如果 session 由本服务创建，则自动 commit"""
-        if self._owns_session and self._session is not None:
-            await self._session.commit()
-
-    async def _close_if_owned(self) -> None:
-        """如果 session 由本服务创建，则自动关闭"""
-        if self._owns_session and self._session is not None:
-            await self._session.close()
-            self._session = None
 
     async def _get_tenant_admins(
         self, session: AsyncSession, tenant_id: str
