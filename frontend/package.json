@@ -31,7 +31,7 @@
     "highlight.js": "^11.10.0",
     "katex": "^0.16.47",
     "marked": "^18.0.7",
-    "mermaid": "^11.16.0",
+    "mermaid": "^11.17.0",
     "pinia": "^3.0.4",
     "vue": "^3.5.41",
     "vue-echarts": "^8.0.1",
