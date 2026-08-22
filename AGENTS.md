@@ -42,7 +42,7 @@ docs/       产品/部署/合规文档; scripts/ 根级工具脚本
 # 后端
 cd backend && pip install -r requirements.txt
 uvicorn main:app --reload --port 8000
-python -m pytest -x -q                 # 测试（约 1850 例）
+python -m pytest -x -q                 # 测试（约 1900 例）
 ruff check . && black --check .        # lint（CI 同款版本见 ci.yml）
 
 # 前端
