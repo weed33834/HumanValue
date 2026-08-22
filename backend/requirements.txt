@@ -116,4 +116,4 @@ opentelemetry-exporter-otlp>=1.24
 # Playwright 浏览器自动化工具 (M4.8). 安装后需: playwright install chromium
 playwright>=1.40.0
 # MFA 双因子 (C.3). 未安装时 MFA 端点返回 501
-pyotp>=2.9
+pyotp>=2.10.0
