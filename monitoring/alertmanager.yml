@@ -1,31 +1,24 @@
 # P1: Alertmanager 告警通知配置
 #
 # 将 Prometheus 告警路由到通知通道:
-# - critical: 飞书/钉钉 Webhook + 邮件
+# - critical: Webhook(飞书/钉钉网关) + 邮件
 # - warning: 邮件
 #
-# 使用方式:
-#   1. 将此文件挂载到 Alertmanager 容器
-#   2. 在 prometheus.yml 中添加:
-#      alerting:
-#        alertmanagers:
-#          - static_configs:
-#              - targets: ['alertmanager:9093']
-#   3. 通过环境变量覆盖通知配置(docker-compose.prod.yml 已处理)
-#      - ALERT_WEBHOOK_URL: 飞书/钉钉 Webhook 地址
-#      - ALERT_EMAIL_TO: 告警邮件收件人
-#      - SMTP_HOST / SMTP_USER / SMTP_PASS: SMTP 认证信息
+# 环境变量注入(docker-compose.prod.yml 已启用 --config.expand-env):
+#   - ALERT_WEBHOOK_URL: 飞书/钉钉 Webhook 地址(compose 默认给 .invalid 占位,
+#    未配置时投递会失败并留下日志,不会静默回环)
+#   - ALERT_EMAIL_TO: 告警邮件收件人
 #
-# 注意: Alertmanager 原生不支持 ${VAR:default} 环境变量替换语法。
-# 此处使用静态默认值,通过 docker-compose 环境变量在容器启动时注入。
-# 如需动态配置,可使用 alertmanager --config.expand-env=true 或 entrypoint 脚本。
+# 注意:
+#   - expand-env 只替换 $VAR / ${VAR},不支持默认值语法;compose 侧负责兜底默认值。
+#   - SMTP 认证(smtp_auth_username/password)涉及敏感信息,不走环境变量模板,
+#     需要邮件告警的部署请挂载自定义 alertmanager.yml 覆盖本文件。
 
 global:
   resolve_timeout: 5m
-  # SMTP 配置(生产环境通过 entrypoint 脚本或 config.expand-env 注入)
+  # SMTP 中继地址: 默认指向本机,绝大多数部署不可用;真实环境请覆盖为你的 SMTP 服务器
   smtp_smarthost: localhost:587
   smtp_from: alertmanager@humanvalue.ai
-  # smtp_auth_username / smtp_auth_password 通过环境变量在 entrypoint 中注入
 
 # 告警路由规则
 route:
@@ -54,9 +47,9 @@ receivers:
 
   - name: "critical-webhook"
     webhook_configs:
-      # 飞书/钉钉 Webhook
-      # 生产部署时通过 alertmanager --config.expand-env=true 替换 $ALERT_WEBHOOK_URL
-      - url: http://localhost:9093
+      # 飞书/钉钉 Webhook 网关地址,由 ALERT_WEBHOOK_URL 注入;
+      # 未配置时 compose 兜底为 .invalid 域名(必然投递失败并留日志,便于发现配置缺失)
+      - url: ${ALERT_WEBHOOK_URL}
         send_resolved: true
     email_configs:
       - to: admin@humanvalue.ai
@@ -71,7 +64,7 @@ receivers:
 inhibit_rules:
   # 评估失败率高时抑制 P99 延迟告警(失败率说明已有问题)
   - source_match:
-      alertname: EmpvalueEvaluationFailureRateHigh
+      alertname: HumanvalueEvaluationFailureRateHigh
     target_match:
-      alertname: EmpvalueEvaluationP99LatencyHigh
+      alertname: HumanvalueEvaluationP99LatencyHigh
     equal: ["service"]
