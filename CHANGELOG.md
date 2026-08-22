@@ -3,6 +3,16 @@
 本文件记录 HumanValue 所有显著变更,格式遵循 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/),
 版本号遵循 [语义化版本](https://semver.org/lang/zh-CN/)。
 
+## [v1.0.5] - 2026-08-22
+
+### 自动化: 镜像同步 + 版本一致性门禁
+
+- **新增 `sync-mirrors` workflow**: main 更新后自动强制同步到 GitCode/Gitee 镜像;
+  Secrets `GITCODE_KEY`/`GITEE_TOKEN` 未配置时跳过对应目标,不阻塞流水线。
+- **新增版本一致性门禁**: `scripts/check_version_consistency.py` 校验 VERSION /
+  package.json / 三语 README 徽章 / CHANGELOG 顶部条目五处一致,已接入 ci.yml 首个检查步。
+  此前 VERSION=2.8.0、徽章=2.8.1、CHANGELOG=2.8.5 三处漂移的问题从此被 CI 拦截。
+
 ## [v1.0.4] - 2026-08-22
 
 ### 产品落地: 企业/高校方案 + 员工权利合规
