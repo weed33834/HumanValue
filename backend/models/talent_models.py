@@ -6,7 +6,7 @@
 所有写操作由路由层控制事务，服务层只做查询/组装。
 """
 
-from datetime import datetime, timezone
+from datetime import datetime
 from typing import Optional
 
 from sqlalchemy import (

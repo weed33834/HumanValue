@@ -18,7 +18,7 @@ from __future__ import annotations
 
 import logging
 import statistics
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -446,7 +446,6 @@ class TalentValueService:
         rows = await self._latest_evaluations()
         vals = []
         for ev, user in rows:
-            mv = _parse_manager_view(ev.manager_view)
             value = float(ev.overall_score or 0) * _avg_dim_score(ev.employee_view)
             vals.append(
                 {

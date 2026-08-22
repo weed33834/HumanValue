@@ -15,7 +15,6 @@ LLM 输出回归评估脚本
 import argparse
 import asyncio
 import json
-import re
 import sys
 from pathlib import Path
 from typing import Any, Dict, List, Tuple
@@ -30,9 +29,6 @@ from agent.tools import AgentToolkit, DummyCompanyKB, DummyMemoryStore
 from core.config import Settings
 from core.model_router import ModelRouter
 from core.providers.base import (
-    BaseProvider,
-    ChatCompletion,
-    ChatMessage,
     ProviderConfig,
 )
 from eval.constants import NEGATIVE_WORDS
@@ -84,7 +80,6 @@ def load_dataset(path: str = None) -> List[Dict[str, Any]]:
 # 避免两处 Mock 行为漂移。此处重新导出以保持既有导入路径向后兼容。
 from core.providers.mock_provider import (  # noqa: E402
     MockProvider,
-    build_mock_evaluation,
 )
 
 

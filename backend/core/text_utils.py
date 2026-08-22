@@ -11,7 +11,7 @@ import math
 import re
 import unicodedata
 from collections import Counter, defaultdict
-from typing import Any, Dict, List, Optional, Sequence, Tuple
+from typing import Dict, List, Sequence
 
 _ZERO_WIDTH = re.compile(r"[\u200b-\u200f\u202a-\u202e\ufeff]")
 _HTML_TAG = re.compile(r"<[^>]+>")

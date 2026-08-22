@@ -31,7 +31,7 @@ import json
 import logging
 import time
 from contextlib import nullcontext
-from typing import Annotated, Any, Dict, List, Optional
+from typing import Annotated, Any, Dict, Optional
 
 import operator
 
@@ -214,7 +214,6 @@ REPORT_WRITER_PROMPT = """你是报告生成专家。汇总各 Agent 的 artifac
 # JSON 容错解析与 LLM 调用 helper 已收口至 core/json_utils(唯一实现),
 # 此处以旧名称导入,调用点无需改动
 from agent._json_util import call_llm_json as _call_llm_json  # noqa: E402
-from agent._json_util import safe_json_parse as _safe_json_parse  # noqa: E402
 
 
 def _append_timeline(state: dict, node: str, status: str = "ok", **extra: Any) -> list:

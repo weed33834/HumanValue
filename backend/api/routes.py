@@ -25,7 +25,6 @@ from api.deps import (
     AppState,
     assert_manager_team_access,
     get_app_state,
-    get_approval_service,
     get_audit_service,
     get_evaluation_service,
 )

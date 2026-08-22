@@ -9,7 +9,6 @@ from __future__ import annotations
 
 import logging
 import uuid
-from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Request, status
@@ -285,7 +284,7 @@ async def list_recognitions(
     session: AsyncSession = Depends(get_db),
 ):
     """认可列表"""
-    from sqlalchemy import select, func
+    from sqlalchemy import select
 
     result = await session.execute(
         select(Recognition)

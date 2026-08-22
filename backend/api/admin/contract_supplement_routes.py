@@ -62,7 +62,6 @@ from services.budget_service import BudgetService
 from services.graph_rag_service import GraphRAGService
 from services.gray_release_service import GrayReleaseService
 from services.nl2sql_service import NL2SQLService
-from services.sensitive_word_service import SensitiveWordService
 
 logger = logging.getLogger(__name__)
 

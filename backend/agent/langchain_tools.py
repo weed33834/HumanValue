@@ -185,7 +185,7 @@ def _build_builtin_tools(enabled_csv: Optional[str] = None) -> List[Any]:
             try:
                 # SSRF 防护
                 if _is_internal_url(url):
-                    return f"Fetch failed: 不允许访问内部地址"
+                    return "Fetch failed: 不允许访问内部地址"
                 import trafilatura
 
                 downloaded = trafilatura.fetch_url(url)
@@ -228,7 +228,7 @@ def _build_builtin_tools(enabled_csv: Optional[str] = None) -> List[Any]:
 
                 # SSRF 防护
                 if _is_internal_url(url):
-                    return f"Fetch failed: 不允许访问内部地址"
+                    return "Fetch failed: 不允许访问内部地址"
                 req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
                 with urllib.request.urlopen(req, timeout=15) as resp:
                     content = resp.read().decode("utf-8", errors="replace")

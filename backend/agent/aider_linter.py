@@ -33,7 +33,6 @@ import re
 import shlex
 import subprocess
 import sys
-import traceback
 import warnings
 from dataclasses import dataclass, field
 from pathlib import Path
