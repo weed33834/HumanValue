@@ -26,13 +26,13 @@ docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
 
 | 告警 | 阈值 | 严重度 | 窗口 | 指标 |
 |---|---|---|---|---|
-| EmpvalueEvaluationFailureRateHigh | 失败率 >5% | critical | 5m | `humanvalue_evaluation_failures_total` / `humanvalue_evaluations_total` |
-| EmpvalueEvaluationP99LatencyHigh | P99 >3s | warning | 5m | `humanvalue_evaluation_duration_seconds` |
-| EmpvalueLlmFailureRateHigh | 失败率 >10% | critical | 5m | `humanvalue_llm_requests_total` |
+| HumanvalueEvaluationFailureRateHigh | 失败率 >5% | critical | 5m | `humanvalue_evaluation_failures_total` / `humanvalue_evaluations_total` |
+| HumanvalueEvaluationP99LatencyHigh | P99 >3s | warning | 5m | `humanvalue_evaluation_duration_seconds` |
+| HumanvalueLlmFailureRateHigh | 失败率 >10% | critical | 5m | `humanvalue_llm_requests_total` |
 
 ---
 
-## 1. EmpvalueEvaluationFailureRateHigh(评估失败率 >5%)
+## 1. HumanvalueEvaluationFailureRateHigh(评估失败率 >5%)
 
 ### 触发条件
 
@@ -74,7 +74,7 @@ docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
 
 ---
 
-## 2. EmpvalueEvaluationP99LatencyHigh(评估 P99 耗时 >3s)
+## 2. HumanvalueEvaluationP99LatencyHigh(评估 P99 耗时 >3s)
 
 ### 触发条件
 
@@ -106,7 +106,7 @@ histogram_quantile(
 
 ---
 
-## 3. EmpvalueLlmFailureRateHigh(LLM 调用失败率 >10%)
+## 3. HumanvalueLlmFailureRateHigh(LLM 调用失败率 >10%)
 
 ### 触发条件
 

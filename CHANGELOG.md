@@ -3,6 +3,25 @@
 本文件记录 HumanValue 所有显著变更,格式遵循 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/),
 版本号遵循 [语义化版本](https://semver.org/lang/zh-CN/)。
 
+## [v1.0.7] - 2026-08-22
+
+### 全量审计第二批: 基础设施一致性与告警链路修复
+
+- **告警通知链路修复(此前开箱即坏)**: critical-webhook 原指向 Alertmanager 自身端口形成无效回环;
+  现改由 `ALERT_WEBHOOK_URL` 环境变量注入,compose 启用 `--config.expand-env`,
+  未配置时兜底 `.invalid` 域名——投递失败留日志可发现,而非静默假成功;
+  移除文件头关于"SMTP 凭据经 entrypoint 注入"的不实注释。
+- **品牌残留新变体清理**: 告警名 `Empvalue*` → `Humanvalue*`(alerts.yml / alertmanager.yml /
+  docs/alerting-rules.md,此大小写形态逃过了此前的三形态扫描)。
+- **k8s 模板占位密钥防线**: secret.yaml 的模板占位值(JWT/FIELD_ENCRYPTION_KEY)加入
+  check_prod_readiness 黑名单,新增回归测试锁定——模板原样 apply 到生产不再误报 PASS。
+- **release 版本守卫**: tag 必须与 VERSION 文件一致才能走发布链,杜绝 v9.9.9 式漂移发布。
+- **security.yml**: 删除假 `--ignore-vuln GHSA-xxxx-ignore-placeholder` 占位 ID,
+  改为正确解析 pip-audit-ignore.txt(过滤注释行并逐条转 --ignore-vuln 参数)。
+- **dependabot.yml**: 移除 schema 不支持的 `auto-merge` 无效键(自动合并由专用 workflow 负责)。
+- **杂项一致性**: waf-ingress.yaml 引用不存在的 waf-configmap.yaml 已更正;
+  grafana provisioning 文件 agentvalue.yml 改名 humanvalue.yml 并修正注释中的过期文件名。
+
 ## [v1.0.6] - 2026-08-22
 
 ### 全量审计第一批: 虚假实现与弱实现修复
@@ -94,6 +113,10 @@
 - **历史重建**: 开源前所有提交压缩为单个基线提交,旧历史不再对外呈现。
 - 后续变更自 v1.0.1 起,按语义化版本递增尾数补丁号。
 
+[v1.0.7]: https://github.com/weed33834/HumanValue/releases/tag/v1.0.7
+[v1.0.6]: https://github.com/weed33834/HumanValue/releases/tag/v1.0.6
+[v1.0.5]: https://github.com/weed33834/HumanValue/releases/tag/v1.0.5
+[v1.0.4]: https://github.com/weed33834/HumanValue/releases/tag/v1.0.4
 [v1.0.3]: https://github.com/weed33834/HumanValue/releases/tag/v1.0.3
 [v1.0.2]: https://github.com/weed33834/HumanValue/releases/tag/v1.0.2
 [v1.0.1]: https://github.com/weed33834/HumanValue/releases/tag/v1.0.1

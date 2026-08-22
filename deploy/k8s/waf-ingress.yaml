@@ -8,8 +8,9 @@
 #        --set controller.config.enable-modsecurity=true \
 #        --set controller.config.modsecurity-snippet=SecRuleEngine On
 #
-#   2. 部署 OWASP CRS ConfigMap:
-#      kubectl apply -f deploy/k8s/waf-configmap.yaml
+#   2. 部署 OWASP CRS 规则(规则内嵌于本文件的 ModSecurity snippet 注解,
+#      无独立 waf-configmap 文件;如需完整 CRS 规则集请按上游文档安装):
+#      kubectl apply -f deploy/k8s/waf-ingress.yaml
 #
 #   3. 更新 Ingress 注解启用 WAF:
 #      在 ingress.yaml 中添加:

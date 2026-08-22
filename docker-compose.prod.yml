@@ -185,10 +185,12 @@ services:
     command:
       - --config.file=/etc/alertmanager/alertmanager.yml
       - --storage.path=/alertmanager
+      - --config.expand-env
     ports:
       - "9093:9093"
     environment:
-      - ALERT_WEBHOOK_URL=${ALERT_WEBHOOK_URL:-}
+      # .invalid 兜底: 未配置真实 webhook 时投递必然失败并留日志,便于发现配置缺失
+      - ALERT_WEBHOOK_URL=${ALERT_WEBHOOK_URL:-http://alert-webhook.invalid}
       - ALERT_EMAIL_TO=${ALERT_EMAIL_TO:-admin@humanvalue.ai}
     restart: unless-stopped
     deploy:

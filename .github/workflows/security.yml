@@ -44,10 +44,9 @@ jobs:
       - name: Audit Python dependencies
         working-directory: backend
         run: |
-          pip-audit -r requirements.txt \
-            --ignore-vuln GHSA-xxxx-ignore-placeholder \
-            $(cat pip-audit-ignore.txt 2>/dev/null || true) \
-            || true
+          # 白名单来自 pip-audit-ignore.txt(每行一个漏洞 ID,支持注释需过滤掉)
+          IGNORES=$(grep -v '^#' pip-audit-ignore.txt 2>/dev/null | sed '/^$/d' | sed 's/^/--ignore-vuln /' | tr '\n' ' ')
+          pip-audit -r requirements.txt ${IGNORES} || true
       - name: Summary
         if: always()
         run: echo "pip-audit scan complete (warnings do not fail CI)"

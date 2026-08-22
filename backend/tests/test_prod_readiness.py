@@ -115,6 +115,31 @@ class TestCheckReadiness:
         jwt_check = next(c for c in result["checks"] if c["name"] == "jwt_secret_key")
         assert jwt_check["status"] == "FAIL"
 
+    def test_k8s_template_placeholders_fail(self):
+        """deploy/k8s/secret.yaml 模板占位值必须被就绪检查拦截(防模板原样上线)。
+
+        field_encryption_key 仅在生产环境判 FAIL,故本用例显式设置
+        HUMANVALUE_ENV=production 模拟"模板原样 apply 到生产"的场景。
+        """
+        k8s_jwt = "CHANGE-ME-to-a-strong-random-secret-min-32-chars"
+        settings = Settings(
+            auth_demo_mode=False,
+            humanvalue_env="production",
+            jwt_secret_key=k8s_jwt,
+            field_encryption_key="REPLACE_WITH_BASE64_ENCODED_32_BYTE_KEY",
+            database_url=SAFE_DB,
+            model_tier="L1",
+        )
+        result = check_readiness(settings)
+        jwt_check = next(c for c in result["checks"] if c["name"] == "jwt_secret_key")
+        assert jwt_check["status"] == "FAIL", "k8s 模板 JWT 占位值应判 FAIL"
+        fek_check = next(
+            c for c in result["checks"] if c["name"] == "field_encryption_key"
+        )
+        assert (
+            fek_check["status"] == "FAIL"
+        ), "k8s 模板 FIELD_ENCRYPTION_KEY 占位应判 FAIL"
+
     def test_jwt_set_passes(self):
         """JWT_SECRET_KEY 修改为非默认值后 PASS。"""
         settings = Settings(

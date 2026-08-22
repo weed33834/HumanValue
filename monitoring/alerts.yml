@@ -10,7 +10,7 @@ groups:
       # 评估失败率 >5%
       # 分子:humanvalue_evaluation_failures_total(评估任务失败,未产出结果)
       # 分母:成功评估数 + 失败数(总尝试次数)
-      - alert: EmpvalueEvaluationFailureRateHigh
+      - alert: HumanvalueEvaluationFailureRateHigh
         expr: |
           (
             sum(rate(humanvalue_evaluation_failures_total[5m]))
@@ -30,7 +30,7 @@ groups:
           description: "5 分钟窗口评估失败率 {{ $value | humanizePercentage }},阈值 5%。按 reason 标签(graph_error / no_result / exception)定位失败类型,查 backend 日志 grep '评估处理失败'。"
 
       # 评估 P99 耗时 >3s(按 model_tier 分组)
-      - alert: EmpvalueEvaluationP99LatencyHigh
+      - alert: HumanvalueEvaluationP99LatencyHigh
         expr: |
           histogram_quantile(
             0.99,
@@ -46,7 +46,7 @@ groups:
 
       # LLM 调用失败率 >10%
       # status 标签:success / error(openai_provider 重试耗尽记 error)
-      - alert: EmpvalueLlmFailureRateHigh
+      - alert: HumanvalueLlmFailureRateHigh
         expr: |
           (
             sum(rate(humanvalue_llm_requests_total{status="error"}[5m]))
