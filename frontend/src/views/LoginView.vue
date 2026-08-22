@@ -60,7 +60,7 @@
             </el-form-item>
             <div v-if="demoEnabled" class="demo-tip">
               <el-icon><InfoFilled /></el-icon>
-              <span>演示账号：boss@humanvalue.ai / agentvalue123</span>
+              <span>演示账号：boss@humanvalue.ai / humanvalue123</span>
               <el-button link type="primary" @click="seedDemoUsers">初始化演示账号</el-button>
             </div>
           </el-form>
@@ -110,7 +110,7 @@ const jwtFormRef = ref(null)
 const jwtForm = reactive({
   // 仅开发环境预填演示账号,生产构建中不泄露凭据
   email: import.meta.env.DEV ? 'boss@humanvalue.ai' : '',
-  password: import.meta.env.DEV ? 'agentvalue123' : '',
+  password: import.meta.env.DEV ? 'humanvalue123' : '',
 })
 
 const jwtRules = {
@@ -163,7 +163,7 @@ async function seedDemoUsers() {
   loading.value = true
   try {
     const res = await authApi.seedDemoUsers()
-    ElMessage.success(`演示账号已就绪：${res?.created?.length || 0} 个新建，默认密码 agentvalue123`)
+    ElMessage.success(`演示账号已就绪：${res?.created?.length || 0} 个新建，默认密码 humanvalue123`)
   } catch (err) {
     ElMessage.error(err.message || '初始化失败')
   } finally {

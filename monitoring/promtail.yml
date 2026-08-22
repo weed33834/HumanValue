@@ -29,7 +29,7 @@ scrape_configs:
         target_label: stream
       - source_labels: ["__meta_docker_container_label_com_docker_compose_service"]
         target_label: service
-    # 仅采集 agentvalue 相关容器的日志
+    # 仅采集 humanvalue 相关容器的日志
     pipeline_stages:
       # 解析 JSON 格式日志(structlog 输出)
       - json:

@@ -16,7 +16,7 @@ alerting:
         - targets: ['alertmanager:9093']
 
 scrape_configs:
-  - job_name: agentvalue-backend
+  - job_name: humanvalue-backend
     metrics_path: /metrics
     static_configs:
       - targets: ['backend:8000']

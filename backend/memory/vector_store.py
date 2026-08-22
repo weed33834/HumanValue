@@ -72,7 +72,7 @@ def _init_embedding(settings: Settings):
 class ChromaMemoryStore(MemoryStore):
     """基于 ChromaDB + 真实 embedding 的员工长期记忆存储。
 
-    collection 名按租户隔离：agentvalue_memory_{tenant_id}，默认租户为 agentvalue_memory_default。
+    collection 名按租户隔离：humanvalue_memory_{tenant_id}，默认租户为 humanvalue_memory_default。
     显式传入 collection_name 时仍以传入值为准，保持向后兼容。
     """
 
@@ -88,7 +88,7 @@ class ChromaMemoryStore(MemoryStore):
         self.persist_dir = persist_dir or self.settings.vector_store_dir
         self.embedding = _init_embedding(self.settings)
         if collection_name is None:
-            collection_name = f"agentvalue_memory_{self.tenant_id}"
+            collection_name = f"humanvalue_memory_{self.tenant_id}"
 
         self.client = chromadb.PersistentClient(path=self.persist_dir)
         self.collection = self.client.get_or_create_collection(
@@ -199,7 +199,7 @@ class ChromaMemoryStore(MemoryStore):
 class ChromaCompanyKB(CompanyKB):
     """基于 ChromaDB + 真实 embedding 的公司知识库 RAG。
 
-    collection 名按租户隔离：agentvalue_kb_{tenant_id}，默认租户为 agentvalue_kb_default。
+    collection 名按租户隔离：humanvalue_kb_{tenant_id}，默认租户为 humanvalue_kb_default。
     显式传入 collection_name 时仍以传入值为准，保持向后兼容。
     """
 
@@ -215,7 +215,7 @@ class ChromaCompanyKB(CompanyKB):
         self.persist_dir = persist_dir or self.settings.vector_store_dir
         self.embedding = _init_embedding(self.settings)
         if collection_name is None:
-            collection_name = f"agentvalue_kb_{self.tenant_id}"
+            collection_name = f"humanvalue_kb_{self.tenant_id}"
 
         self.client = chromadb.PersistentClient(path=self.persist_dir)
         self.collection = self.client.get_or_create_collection(

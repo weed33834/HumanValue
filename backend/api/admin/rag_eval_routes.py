@@ -80,7 +80,7 @@ def _resolve_collection_name(
     request: Request, tenant_id: str, collection_name: str
 ) -> str:
     """校验 collection_name 归属当前租户, 防止跨租户访问知识库"""
-    tenant_prefix = f"agentvalue_kb_{tenant_id}"
+    tenant_prefix = f"humanvalue_kb_{tenant_id}"
     if collection_name == tenant_prefix or collection_name.startswith(
         tenant_prefix + "_"
     ):

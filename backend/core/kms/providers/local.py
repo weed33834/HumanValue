@@ -8,7 +8,7 @@ DEK 直接用 os.urandom 生成,"加密"用对称 dict 模拟。
 - 单元测试:测试 EnvelopeCipher 逻辑不依赖外部服务
 - 降级 fallback:其他 KMS 不可用时临时使用 (生产严禁)
 
-生产环境 agentvalue_env == "production" 时 factory 会拒绝 fallback 到 local,
+生产环境 humanvalue_env == "production" 时 factory 会拒绝 fallback 到 local,
 除非显式 field_encryption_backend=local (开发自检场景)。
 """
 

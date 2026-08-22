@@ -16,7 +16,7 @@ kind: NetworkPolicy
 metadata:
   name: default-deny-ingress
   labels:
-    app.kubernetes.io/name: agentvalue
+    app.kubernetes.io/name: humanvalue
 spec:
   podSelector: {}
   policyTypes:
@@ -28,7 +28,7 @@ kind: NetworkPolicy
 metadata:
   name: backend-ingress
   labels:
-    app.kubernetes.io/name: agentvalue
+    app.kubernetes.io/name: humanvalue
 spec:
   podSelector:
     matchLabels:
@@ -59,7 +59,7 @@ kind: NetworkPolicy
 metadata:
   name: frontend-ingress
   labels:
-    app.kubernetes.io/name: agentvalue
+    app.kubernetes.io/name: humanvalue
 spec:
   podSelector:
     matchLabels:
@@ -81,7 +81,7 @@ kind: NetworkPolicy
 metadata:
   name: redis-ingress
   labels:
-    app.kubernetes.io/name: agentvalue
+    app.kubernetes.io/name: humanvalue
 spec:
   podSelector:
     matchLabels:
@@ -103,7 +103,7 @@ kind: NetworkPolicy
 metadata:
   name: postgres-ingress
   labels:
-    app.kubernetes.io/name: agentvalue
+    app.kubernetes.io/name: humanvalue
 spec:
   podSelector:
     matchLabels:
@@ -126,7 +126,7 @@ kind: NetworkPolicy
 metadata:
   name: backend-egress
   labels:
-    app.kubernetes.io/name: agentvalue
+    app.kubernetes.io/name: humanvalue
 spec:
   podSelector:
     matchLabels:
@@ -175,7 +175,7 @@ kind: NetworkPolicy
 metadata:
   name: frontend-egress
   labels:
-    app.kubernetes.io/name: agentvalue
+    app.kubernetes.io/name: humanvalue
 spec:
   podSelector:
     matchLabels:

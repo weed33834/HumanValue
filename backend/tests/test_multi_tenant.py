@@ -298,14 +298,14 @@ async def test_kb_store_collection_isolation():
 
 
 def test_vector_store_default_collection_name():
-    """默认租户 collection 名为 agentvalue_memory_default / agentvalue_kb_default（向后兼容）"""
+    """默认租户 collection 名为 humanvalue_memory_default / humanvalue_kb_default（向后兼容）"""
     settings = Settings(vector_store_dir=get_settings().vector_store_dir)
     store = ChromaMemoryStore(settings=settings, tenant_id="default")
-    assert store.collection.name == "agentvalue_memory_default"
+    assert store.collection.name == "humanvalue_memory_default"
     store.client.close()
 
     kb = ChromaCompanyKB(settings=settings, tenant_id="default")
-    assert kb.collection.name == "agentvalue_kb_default"
+    assert kb.collection.name == "humanvalue_kb_default"
     kb.client.close()
 
 
@@ -313,11 +313,11 @@ def test_vector_store_tenant_collection_name_prefix():
     """非默认租户 collection 名带 tenant 前缀"""
     settings = Settings(vector_store_dir=get_settings().vector_store_dir)
     store = ChromaMemoryStore(settings=settings, tenant_id="acme")
-    assert store.collection.name == "agentvalue_memory_acme"
+    assert store.collection.name == "humanvalue_memory_acme"
     store.client.close()
 
     kb = ChromaCompanyKB(settings=settings, tenant_id="globex")
-    assert kb.collection.name == "agentvalue_kb_globex"
+    assert kb.collection.name == "humanvalue_kb_globex"
     kb.client.close()
 
 

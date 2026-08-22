@@ -67,7 +67,7 @@ def test_settings(monkeypatch):
     # 需要开启的用例应显式 monkeypatch 或传参构造 Settings(...)。
     monkeypatch.setattr(settings, "debug", False)
     monkeypatch.setattr(settings, "llm_mock_mode", False)
-    monkeypatch.setattr(settings, "agentvalue_env", "development")
+    monkeypatch.setattr(settings, "humanvalue_env", "development")
 
     tmp_dir = tempfile.mkdtemp(prefix="chroma_test_")
     monkeypatch.setattr(settings, "vector_store_dir", tmp_dir)

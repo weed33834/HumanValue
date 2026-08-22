@@ -48,7 +48,7 @@ def create_kms_provider(settings=None) -> Optional[KMSProvider]:
         settings = get_settings()
 
     backend = (settings.field_encryption_backend or "env").lower()
-    is_production = settings.agentvalue_env == "production"
+    is_production = settings.humanvalue_env == "production"
 
     if backend == "env":
         # 传统模式:不用 KMS,降级到 FieldCipher

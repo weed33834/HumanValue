@@ -150,7 +150,7 @@ class Settings(BaseSettings):
     # 演示模式：开启时允许通过 x-user-role / x-user-id header 伪造身份（仅开发/测试用）
     auth_demo_mode: bool = False
     # 演示模式默认密码 (仅 auth_demo_mode=True 时使用, 生产环境必须修改)
-    demo_default_password: str = "agentvalue123"
+    demo_default_password: str = "humanvalue123"
 
     # ====== M14 企业治理：登录风控 (C.6) ======
     login_lock_threshold: int = 5
@@ -188,7 +188,7 @@ class Settings(BaseSettings):
 
     # 运行环境标识：仅当值为 "production" 时启用生产安全校验；
     # 不设或非 production 时不做任何校验，确保开发与测试环境不受影响。
-    agentvalue_env: Optional[str] = None
+    humanvalue_env: Optional[str] = None
 
     # 数据留存策略（Phase 9.3）：GDPR/个保法要求原始输入 2 年、评估 5 年，
     # 到期先归档缓冲 30 天再删除，避免误删与申诉期数据缺失。
@@ -224,11 +224,11 @@ class Settings(BaseSettings):
     vault_field_kek_name: str = (
         "humanvalue-field-kek"  # Transit key name for field encryption
     )
-    vault_jwt_key_path: str = "agentvalue/jwt-signing-key"  # KV v2 path for JWT secret
+    vault_jwt_key_path: str = "humanvalue/jwt-signing-key"  # KV v2 path for JWT secret
     vault_verify_tls: bool = True
 
     # AWS KMS 配置 (field_encryption_backend=aws 时必填)
-    aws_kms_key_id: Optional[str] = None  # alias/agentvalue-field-kek 或 key ARN
+    aws_kms_key_id: Optional[str] = None  # alias/humanvalue-field-kek 或 key ARN
     aws_kms_region: Optional[str] = None  # 默认从环境推断
 
     # 阿里云 KMS 配置 (field_encryption_backend=aliyun 时必填)
@@ -310,7 +310,7 @@ class Settings(BaseSettings):
     # 租户查询守卫（core/tenant_guard.py）总开关
     tenant_guard_enabled: bool = True
     # 守卫模式：warn(默认，仅告警+打点) / enforce(抛异常) / off
-    # 上线流程：先 warn 跑一轮，把 agentvalue_tenant_guard_violations_total
+    # 上线流程：先 warn 跑一轮，把 humanvalue_tenant_guard_violations_total
     # 压到 0 后再 TENANT_GUARD_MODE=enforce
     tenant_guard_mode: str = "warn"
 
@@ -348,21 +348,21 @@ class Settings(BaseSettings):
     @model_validator(mode="after")
     def _enforce_prod_demo_mode_guard(self) -> "Settings":
         """
-        生产环境守护：当处于生产环境（AGENTVALUE_ENV=production）且开启演示模式时，
+        生产环境守护：当处于生产环境（HUMANVALUE_ENV=production）且开启演示模式时，
         直接禁止实例化，避免身份伪造能力泄漏到生产。
 
         安全设计要点：
-        - 仅当 agentvalue_env == "production" 时才校验，其余情况（含默认 None）完全放行；
-        - 现有测试套件不设置 AGENTVALUE_ENV，且 conftest 通过 monkeypatch 在已实例化
+        - 仅当 humanvalue_env == "production" 时才校验，其余情况（含默认 None）完全放行；
+        - 现有测试套件不设置 HUMANVALUE_ENV，且 conftest 通过 monkeypatch 在已实例化
           对象上修改 auth_demo_mode（model_config 未开启 validate_assignment），
           不会再次触发本校验器，故对现有测试零影响。
         - 仅做 auth_demo_mode 硬失败(身份伪造 = 灾难级)；JWT/CORS/field_encryption_key
           等其余生产检查由 scripts/check_prod_readiness.py 作为 advisory gatekeeper
           返回 PASS/WARN/FAIL,分层设计避免本校验器抢占脚本检查项导致测试无法构造场景。
         """
-        if self.agentvalue_env == "production" and self.auth_demo_mode:
+        if self.humanvalue_env == "production" and self.auth_demo_mode:
             raise ValueError("生产环境禁止开启 AUTH_DEMO_MODE(auth_demo_mode)")
-        if self.agentvalue_env == "production" and self.llm_mock_mode:
+        if self.humanvalue_env == "production" and self.llm_mock_mode:
             # 与 auth_demo_mode 同级的灾难级风险：Mock 结果若流入生产，
             # 会让虚构的评分与风险标记被当成真实绩效依据。
             raise ValueError("生产环境禁止开启 LLM_MOCK_MODE(llm_mock_mode)")

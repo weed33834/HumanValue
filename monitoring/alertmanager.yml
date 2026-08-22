@@ -24,7 +24,7 @@ global:
   resolve_timeout: 5m
   # SMTP 配置(生产环境通过 entrypoint 脚本或 config.expand-env 注入)
   smtp_smarthost: localhost:587
-  smtp_from: alertmanager@agentvalue.ai
+  smtp_from: alertmanager@humanvalue.ai
   # smtp_auth_username / smtp_auth_password 通过环境变量在 entrypoint 中注入
 
 # 告警路由规则
@@ -49,7 +49,7 @@ route:
 receivers:
   - name: "default"
     email_configs:
-      - to: admin@agentvalue.ai
+      - to: admin@humanvalue.ai
         send_resolved: true
 
   - name: "critical-webhook"
@@ -59,12 +59,12 @@ receivers:
       - url: http://localhost:9093
         send_resolved: true
     email_configs:
-      - to: admin@agentvalue.ai
+      - to: admin@humanvalue.ai
         send_resolved: true
 
   - name: "warning-email"
     email_configs:
-      - to: admin@agentvalue.ai
+      - to: admin@humanvalue.ai
         send_resolved: true
 
 # 告警抑制规则(避免告警风暴)

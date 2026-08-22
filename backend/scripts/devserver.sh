@@ -7,7 +7,7 @@ set -euo pipefail
 
 BACKEND_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 PID_FILE="${BACKEND_DIR}/.devserver.pid"
-LOG_FILE="${LOG_FILE:-/tmp/agentvalue-backend.log}"
+LOG_FILE="${LOG_FILE:-/tmp/humanvalue-backend.log}"
 PORT="${PORT:-8000}"
 HOST="${HOST:-0.0.0.0}"
 PYTHON="${BACKEND_DIR}/.venv/bin/python"

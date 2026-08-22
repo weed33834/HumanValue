@@ -278,7 +278,7 @@ class CodeInterpreter:
         # 每次执行创建独立临时工作目录: 隔离 cwd + 事后统一清理
         # (沙箱内 open 已被屏蔽, 目录主要防止并发执行间工作目录互相污染,
         #  并为未来放开受限文件读写预留干净挂载点)
-        workdir = tempfile.mkdtemp(prefix="agentvalue_sandbox_")
+        workdir = tempfile.mkdtemp(prefix="humanvalue_sandbox_")
         try:
             try:
                 proc = await asyncio.create_subprocess_exec(

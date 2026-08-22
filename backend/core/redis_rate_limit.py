@@ -41,7 +41,7 @@ from starlette.types import ASGIApp, Receive, Scope, Send
 logger = logging.getLogger(__name__)
 
 # 令牌桶在 Redis 中的键前缀，按维度分区
-_KEY_PREFIX = "agentvalue:rate_limit"
+_KEY_PREFIX = "humanvalue:rate_limit"
 
 # 四维名称（顺序即文档展示顺序）
 DIMENSIONS = ("tenant", "api_key", "user", "endpoint")
@@ -75,7 +75,7 @@ def _is_connection_error(exc: Exception) -> bool:
 # ---------------------------------------------------------------------------
 # 原子 Lua 脚本：取桶 -> 补令牌 -> 扣令牌 -> 写回
 # ---------------------------------------------------------------------------
-# KEYS[1]   = 桶键（agentvalue:rate_limit:<dim>:<key>）
+# KEYS[1]   = 桶键（humanvalue:rate_limit:<dim>:<key>）
 # ARGV[1]   = capacity（桶容量，即突发上限）
 # ARGV[2]   = refill（每秒补充令牌数）
 # ARGV[3]   = now（当前时间戳，秒，浮点，由调用方传入便于测试伪造时钟）

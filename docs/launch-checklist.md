@@ -10,7 +10,7 @@
 - [ ] Docker Compose 校验：`docker compose config -q`
 
 ## 二、配置与密钥
-- [ ] `JWT_SECRET_KEY`：至少 32 字符强随机，`AGENTVALUE_ENV=production`
+- [ ] `JWT_SECRET_KEY`：至少 32 字符强随机，`HUMANVALUE_ENV=production`
 - [ ] `FIELD_ENCRYPTION_KEY`：32 字节（44 字符 base64 或 64 字符 hex），`python -c "import base64,os;print(base64.b64encode(os.urandom(32)).decode())"`
 - [ ] `CORS_ORIGINS`：设置为实际前端域名
 - [ ] `DATABASE_URL`：切换到 PostgreSQL

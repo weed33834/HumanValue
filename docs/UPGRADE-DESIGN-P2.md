@@ -526,7 +526,7 @@ class StreamChunk:
 
 ## 五、Trace Replay(简版)
 
-Langfuse 自身支持 Trace Replay,agentvalue 不重复造轮子,只做:
+Langfuse 自身支持 Trace Replay,humanvalue 不重复造轮子,只做:
 - `GET /api/v1/admin/debug/evaluation/{id}/replay` — 重放某次评估的输入 + prompt 版本,产生新 trace
 - 前端 Debug 页加 "Replay" 按钮,跳转 Playground 自动填充历史输入
 

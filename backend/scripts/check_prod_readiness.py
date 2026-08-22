@@ -45,7 +45,7 @@ DEFAULT_JWT_SECRETS = {
 }
 
 # 默认演示密码黑名单 (生产环境不允许使用默认值)
-DEFAULT_DEMO_PASSWORDS = {"agentvalue123", "password", "123456", "admin123"}
+DEFAULT_DEMO_PASSWORDS = {"humanvalue123", "password", "123456", "admin123"}
 
 # 已知的敏感凭据占位值（小写匹配），生产环境必须替换为真实值
 # 覆盖 FIELD_ENCRYPTION_KEY / OCR_CLOUD_API_KEY / ASR_CLOUD_API_KEY 等
@@ -84,7 +84,7 @@ def _check_demo_default_password(settings: Settings) -> dict:
     非生产环境 -> WARN。
     """
     pwd = settings.demo_default_password or ""
-    is_production = settings.agentvalue_env == "production"
+    is_production = settings.humanvalue_env == "production"
     if pwd.strip() == "" or pwd.strip().lower() in DEFAULT_DEMO_PASSWORDS:
         if is_production:
             return {
@@ -154,7 +154,7 @@ def _check_model_tier(settings: Settings) -> dict:
 def _check_field_encryption_key(settings: Settings) -> dict:
     """检查字段级加密密钥是否已配置（生产环境必填，否则敏感字段明文落库）。
 
-    仅在生产环境（AGENTVALUE_ENV=production）强制 FAIL；非生产环境未配置仅 WARN。
+    仅在生产环境（HUMANVALUE_ENV=production）强制 FAIL；非生产环境未配置仅 WARN。
     占位值（空、change-me 等）视为未配置。
     """
     key = settings.field_encryption_key
@@ -163,7 +163,7 @@ def _check_field_encryption_key(settings: Settings) -> dict:
         or key.strip() == ""
         or key.strip().lower() in DEFAULT_SECRET_PLACEHOLDERS
     )
-    is_production = settings.agentvalue_env == "production"
+    is_production = settings.humanvalue_env == "production"
 
     if is_placeholder:
         if is_production:
@@ -223,7 +223,7 @@ def _check_cors_origins(settings: Settings) -> dict:
     仅在生产环境强制 FAIL；非生产环境未配置或为默认值仅 WARN。
     """
     origins = (settings.cors_origins or "").strip()
-    is_production = settings.agentvalue_env == "production"
+    is_production = settings.humanvalue_env == "production"
     parts = [o.strip() for o in origins.split(",") if o.strip()]
     has_wildcard = any(o == "*" for o in parts)
 
@@ -257,7 +257,7 @@ def _check_jwt_algorithm(settings: Settings) -> dict:
     H4 RS256 切换可在 KMS 落地后顺带处理 (此处不强制)。
     """
     algo = (settings.jwt_algorithm or "").strip().upper()
-    is_production = settings.agentvalue_env == "production"
+    is_production = settings.humanvalue_env == "production"
     if is_production and algo == "HS256":
         return {
             "name": "jwt_algorithm",
@@ -286,7 +286,7 @@ def _check_kms_configured(settings: Settings) -> dict:
     非生产环境:env / local 仅 WARN (开发友好)
     """
     backend = (getattr(settings, "field_encryption_backend", "env") or "env").lower()
-    is_production = settings.agentvalue_env == "production"
+    is_production = settings.humanvalue_env == "production"
 
     # env / local 模式 (明文配置)
     if backend in ("env", "local"):

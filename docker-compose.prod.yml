@@ -19,7 +19,7 @@ services:
         condition: service_healthy
     environment:
       # 生产模式守护:auth_demo_mode 必须为 false,JWT_SECRET_KEY 必须为强随机值
-      - AGENTVALUE_ENV=production
+      - HUMANVALUE_ENV=production
       # JWT_SECRET_KEY 必须通过 .env 注入,占位值会被 check_prod_readiness 拦截
       - JWT_SECRET_KEY=${JWT_SECRET_KEY:?JWT_SECRET_KEY must be set in production}
       # 切换为 PostgreSQL(覆盖基础 compose 中的 SQLite 连接串);凭据必须通过 .env 注入

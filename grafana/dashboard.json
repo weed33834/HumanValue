@@ -63,7 +63,7 @@
         {
           "datasource": "Prometheus",
           "editorMode": "code",
-          "expr": "sum by (status) (rate(agentvalue_evaluations_total[5m]))",
+          "expr": "sum by (status) (rate(humanvalue_evaluations_total[5m]))",
           "legendFormat": "{{status}}",
           "range": true,
           "refId": "A"
@@ -121,7 +121,7 @@
         {
           "datasource": "Prometheus",
           "editorMode": "code",
-          "expr": "histogram_quantile(0.50, sum by (le) (rate(agentvalue_evaluation_duration_seconds_bucket[5m])))",
+          "expr": "histogram_quantile(0.50, sum by (le) (rate(humanvalue_evaluation_duration_seconds_bucket[5m])))",
           "legendFormat": "P50",
           "range": true,
           "refId": "A"
@@ -129,7 +129,7 @@
         {
           "datasource": "Prometheus",
           "editorMode": "code",
-          "expr": "histogram_quantile(0.95, sum by (le) (rate(agentvalue_evaluation_duration_seconds_bucket[5m])))",
+          "expr": "histogram_quantile(0.95, sum by (le) (rate(humanvalue_evaluation_duration_seconds_bucket[5m])))",
           "legendFormat": "P95",
           "range": true,
           "refId": "B"
@@ -137,7 +137,7 @@
         {
           "datasource": "Prometheus",
           "editorMode": "code",
-          "expr": "histogram_quantile(0.99, sum by (le) (rate(agentvalue_evaluation_duration_seconds_bucket[5m])))",
+          "expr": "histogram_quantile(0.99, sum by (le) (rate(humanvalue_evaluation_duration_seconds_bucket[5m])))",
           "legendFormat": "P99",
           "range": true,
           "refId": "C"
@@ -189,7 +189,7 @@
         {
           "datasource": "Prometheus",
           "editorMode": "code",
-          "expr": "sum by (action) (rate(agentvalue_approval_transitions_total[5m]))",
+          "expr": "sum by (action) (rate(humanvalue_approval_transitions_total[5m]))",
           "legendFormat": "{{action}}",
           "range": true,
           "refId": "A"
@@ -241,7 +241,7 @@
         {
           "datasource": "Prometheus",
           "editorMode": "code",
-          "expr": "sum by (type) (rate(agentvalue_feedback_total[5m]))",
+          "expr": "sum by (type) (rate(humanvalue_feedback_total[5m]))",
           "legendFormat": "{{type}}",
           "range": true,
           "refId": "A"
@@ -253,13 +253,13 @@
   ],
   "refresh": "30s",
   "schemaVersion": 39,
-  "tags": ["agentvalue", "ai-evaluation"],
+  "tags": ["humanvalue", "ai-evaluation"],
   "templating": { "list": [] },
   "time": { "from": "now-6h", "to": "now" },
   "timepicker": {},
   "timezone": "",
   "title": "HumanValue 业务监控",
-  "uid": "agentvalue-overview",
+  "uid": "humanvalue-overview",
   "version": 1,
   "weekStart": ""
 }

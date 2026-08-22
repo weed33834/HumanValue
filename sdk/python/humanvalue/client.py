@@ -4,7 +4,7 @@
 
 .. code-block:: python
 
-    from agentvalue import Client
+    from humanvalue import Client
 
     client = Client(base_url="https://your-host.example", api_key="ak_xxxx")
     me = client.get_me()                      # 连通性自检
@@ -15,7 +15,7 @@ Webhook 签名校验（与 services/webhook_delivery_service.py 的配方完全�
 
 .. code-block:: python
 
-    from agentvalue import verify_webhook_signature
+    from humanvalue import verify_webhook_signature
 
     valid = verify_webhook_signature(
         secret="whsec_...",

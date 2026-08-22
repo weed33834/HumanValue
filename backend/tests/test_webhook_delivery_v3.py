@@ -132,7 +132,7 @@ def _create_subscription(client, **overrides):
     """便捷创建订阅"""
     payload = {
         "name": "测试订阅",
-        "url": "https://hooks.example.com/agentvalue",
+        "url": "https://hooks.example.com/humanvalue",
         "events": ["evaluation.*"],
         **overrides,
     }

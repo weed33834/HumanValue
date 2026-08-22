@@ -125,7 +125,7 @@ class InMemoryJobQueue(JobQueue):
 
 
 class RedisJobQueue(JobQueue):
-    """Redis 实现:多实例共享任务状态,key 前缀 agentvalue:job:
+    """Redis 实现:多实例共享任务状态,key 前缀 humanvalue:job:
 
     所有操作包 try/except:Redis 故障时仅记日志不抛异常,避免拖垮评估主流程
     (任务状态查询失败远比阻断评估可接受)。
@@ -134,7 +134,7 @@ class RedisJobQueue(JobQueue):
     Python dict.update→SET"链路的并发丢更新竞态(参考 LiteLLM Redis 实践)。
     """
 
-    KEY_PREFIX = "agentvalue:job:"
+    KEY_PREFIX = "humanvalue:job:"
 
     # Lua 脚本: 原子读-改-写 update
     # KEYS[1] = job key

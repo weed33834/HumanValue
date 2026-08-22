@@ -14,15 +14,15 @@ from scripts.check_prod_readiness import check_readiness
 
 # 一组合法的「非默认」配置，用于构造可通过各项检查的 Settings
 SAFE_JWT = "prod-strong-random-jwt-secret-0x9f8e7d6c5b4a"
-SAFE_DB = "postgresql+asyncpg://user:pass@db-host:5432/agentvalue"
+SAFE_DB = "postgresql+asyncpg://user:pass@db-host:5432/humanvalue"
 
 
 class TestConfigValidator:
     """core.config.Settings 的生产守护 model_validator。"""
 
     def test_production_demo_mode_raises(self, monkeypatch):
-        """生产环境（AGENTVALUE_ENV=production）+ demo_mode=True -> 抛 ValueError。"""
-        monkeypatch.setenv("AGENTVALUE_ENV", "production")
+        """生产环境（HUMANVALUE_ENV=production）+ demo_mode=True -> 抛 ValueError。"""
+        monkeypatch.setenv("HUMANVALUE_ENV", "production")
         monkeypatch.setenv("AUTH_DEMO_MODE", "true")
         with pytest.raises(ValueError, match="生产环境禁止开启 AUTH_DEMO_MODE"):
             Settings()
@@ -30,26 +30,26 @@ class TestConfigValidator:
     def test_non_production_demo_mode_no_raise(self, monkeypatch):
         """非生产环境（默认）+ demo_mode=True -> 不抛（现有测试环境兼容）。"""
         # 确保未处于生产环境
-        monkeypatch.delenv("AGENTVALUE_ENV", raising=False)
+        monkeypatch.delenv("HUMANVALUE_ENV", raising=False)
         monkeypatch.delenv("AUTH_DEMO_MODE", raising=False)
         settings = Settings(auth_demo_mode=True)
         assert settings.auth_demo_mode is True
-        assert settings.agentvalue_env is None
+        assert settings.humanvalue_env is None
 
     def test_production_demo_mode_off_no_raise(self, monkeypatch):
         """生产环境 + demo_mode=False -> 不抛。"""
-        monkeypatch.setenv("AGENTVALUE_ENV", "production")
+        monkeypatch.setenv("HUMANVALUE_ENV", "production")
         monkeypatch.setenv("AUTH_DEMO_MODE", "false")
         settings = Settings()
-        assert settings.agentvalue_env == "production"
+        assert settings.humanvalue_env == "production"
         assert settings.auth_demo_mode is False
 
     def test_non_production_env_value_no_raise(self, monkeypatch):
-        """AGENTVALUE_ENV 为非 production 值（如 staging）+ demo_mode=True -> 不抛。"""
-        monkeypatch.setenv("AGENTVALUE_ENV", "staging")
+        """HUMANVALUE_ENV 为非 production 值（如 staging）+ demo_mode=True -> 不抛。"""
+        monkeypatch.setenv("HUMANVALUE_ENV", "staging")
         monkeypatch.setenv("AUTH_DEMO_MODE", "true")
         settings = Settings()
-        assert settings.agentvalue_env == "staging"
+        assert settings.humanvalue_env == "staging"
         assert settings.auth_demo_mode is True
 
 
@@ -205,7 +205,7 @@ class TestCheckReadiness:
             jwt_secret_key=SAFE_JWT,
             database_url=SAFE_DB,
             model_tier="L1",
-            # agentvalue_env 不设默认 None（非生产）
+            # humanvalue_env 不设默认 None（非生产）
             field_encryption_key=None,
         )
         result = check_readiness(settings)
@@ -220,7 +220,7 @@ class TestCheckReadiness:
             jwt_secret_key=SAFE_JWT,
             database_url=SAFE_DB,
             model_tier="L1",
-            agentvalue_env="production",
+            humanvalue_env="production",
             field_encryption_key=None,
         )
         result = check_readiness(settings)
@@ -241,7 +241,7 @@ class TestCheckReadiness:
                 jwt_secret_key=SAFE_JWT,
                 database_url=SAFE_DB,
                 model_tier="L1",
-                agentvalue_env="production",
+                humanvalue_env="production",
                 field_encryption_key=placeholder,
             )
             result = check_readiness(settings)
@@ -261,7 +261,7 @@ class TestCheckReadiness:
             jwt_secret_key=SAFE_JWT,
             database_url=SAFE_DB,
             model_tier="L1",
-            agentvalue_env="production",
+            humanvalue_env="production",
             field_encryption_key=real_key,
         )
         result = check_readiness(settings)
@@ -277,7 +277,7 @@ class TestCheckReadiness:
             jwt_secret_key=SAFE_JWT,
             database_url=SAFE_DB,
             model_tier="L1",
-            agentvalue_env="production",
+            humanvalue_env="production",
             ocr_cloud_api_key=None,
             asr_cloud_api_key=None,
         )
@@ -292,7 +292,7 @@ class TestCheckReadiness:
             jwt_secret_key=SAFE_JWT,
             database_url=SAFE_DB,
             model_tier="L1",
-            agentvalue_env="production",
+            humanvalue_env="production",
             ocr_cloud_api_key="some-real-ocr-key",
             asr_cloud_api_key=None,
         )
@@ -308,7 +308,7 @@ class TestCheckReadiness:
             jwt_secret_key=SAFE_JWT,
             database_url=SAFE_DB,
             model_tier="L1",
-            agentvalue_env="production",
+            humanvalue_env="production",
             ocr_cloud_api_key="real-ocr-key",
             asr_cloud_api_key="real-asr-key",
         )

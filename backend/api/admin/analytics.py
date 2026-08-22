@@ -236,9 +236,9 @@ async def token_usage(
         label_filters.append(f'tier="{tier}"')
     label_filter_str = ",".join(label_filters)
     selector = (
-        f"agentvalue_llm_token_usage_total{{{label_filter_str}}}"
+        f"humanvalue_llm_token_usage_total{{{label_filter_str}}}"
         if label_filter_str
-        else "agentvalue_llm_token_usage_total"
+        else "humanvalue_llm_token_usage_total"
     )
 
     window = _window_for_granularity(granularity)
@@ -321,21 +321,21 @@ async def cost(
 
     # 按 model × direction 二维查询(用于 by_model 与总成本)
     promql_prompt_by_model = (
-        f"sum by (model) (increase(agentvalue_llm_token_usage_total"
+        f"sum by (model) (increase(humanvalue_llm_token_usage_total"
         f'{{{tenant_filter}direction="prompt"}}[{window}]))'
     )
     promql_completion_by_model = (
-        f"sum by (model) (increase(agentvalue_llm_token_usage_total"
+        f"sum by (model) (increase(humanvalue_llm_token_usage_total"
         f'{{{tenant_filter}direction="completion"}}[{window}]))'
     )
 
     # 按 tenant × direction × model 三维查询(用于 by_tenant 精确成本)
     promql_prompt_by_tenant_model = (
-        f"sum by (tenant_id, model) (increase(agentvalue_llm_token_usage_total"
+        f"sum by (tenant_id, model) (increase(humanvalue_llm_token_usage_total"
         f'{{direction="prompt"}}[{window}]))'
     )
     promql_completion_by_tenant_model = (
-        f"sum by (tenant_id, model) (increase(agentvalue_llm_token_usage_total"
+        f"sum by (tenant_id, model) (increase(humanvalue_llm_token_usage_total"
         f'{{direction="completion"}}[{window}]))'
     )
 
@@ -439,9 +439,9 @@ async def provider_distribution(
     """Provider 调用分布:每个 model 的调用次数 / token 总数 / 平均延迟。
 
     数据源:
-    - 调用次数: agentvalue_llm_requests_total Counter 的 increase
-    - token 总数: agentvalue_llm_token_usage_total Counter 的 increase
-    - 平均延迟: agentvalue_llm_request_duration_seconds (Histogram,可能未启用)
+    - 调用次数: humanvalue_llm_requests_total Counter 的 increase
+    - token 总数: humanvalue_llm_token_usage_total Counter 的 increase
+    - 平均延迟: humanvalue_llm_request_duration_seconds (Histogram,可能未启用)
     """
     now = datetime.now(timezone.utc)
     end = _parse_iso_date(end_date, now)
@@ -452,19 +452,19 @@ async def provider_distribution(
     span_seconds = max(int((end - start).total_seconds()), 1)
     window = f"{span_seconds}s"
 
-    # 调用次数: 按 model_tier 聚合(agentvalue_llm_requests_total 的 label 是 model_tier)
+    # 调用次数: 按 model_tier 聚合(humanvalue_llm_requests_total 的 label 是 model_tier)
     promql_calls = (
-        f"sum by (model_tier) (increase(agentvalue_llm_requests_total[{window}]))"
+        f"sum by (model_tier) (increase(humanvalue_llm_requests_total[{window}]))"
     )
     # token 总数: 按 model 聚合(指标 label 是 model)
     promql_tokens = (
-        f"sum by (model) (increase(agentvalue_llm_token_usage_total[{window}]))"
+        f"sum by (model) (increase(humanvalue_llm_token_usage_total[{window}]))"
     )
     # 平均延迟: Histogram 的 sum/count 比值
-    # agentvalue_llm_request_duration_seconds 可能未注册,查询返回空数组时优雅降级
+    # humanvalue_llm_request_duration_seconds 可能未注册,查询返回空数组时优雅降级
     promql_latency = (
-        f"sum by (model_tier) (rate(agentvalue_llm_request_duration_seconds_sum[{window}])) "
-        f"/ sum by (model_tier) (rate(agentvalue_llm_request_duration_seconds_count[{window}]))"
+        f"sum by (model_tier) (rate(humanvalue_llm_request_duration_seconds_sum[{window}])) "
+        f"/ sum by (model_tier) (rate(humanvalue_llm_request_duration_seconds_count[{window}]))"
     )
 
     calls_points, tokens_points, latency_points = await _gather(

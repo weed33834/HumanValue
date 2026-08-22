@@ -56,9 +56,9 @@ ChromaDB 这边用 collection 名做隔离边界，一个 tenant 一个 collecti
 ```python
 # backend/agent/memory.py（示意，实际接入在 Phase 6.2/10.3）
 def get_collection(chroma_client, tenant_id: str):
-    # collection 名固定前缀 agentvalue_，避免和别的业务撞名
+    # collection 名固定前缀 humanvalue_，避免和别的业务撞名
     return chroma_client.get_or_create_collection(
-        name=f"agentvalue_{tenant_id}",
+        name=f"humanvalue_{tenant_id}",
         embedding_function=embedding_fn,
     )
 ```

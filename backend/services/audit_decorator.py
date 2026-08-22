@@ -14,7 +14,7 @@ service 层统一审计装饰器。
 - 从 contextvar（set_audit_context 注入）或 kwargs 兜底提取 actor_id / ip
 - 从返回值或 kwargs 提取 resource_id
 - 复用 self.session 构造 AuditService 写入审计日志
-- 审计失败不阻断业务，仅记 agentvalue_audit_log_failures_total 指标
+- 审计失败不阻断业务，仅记 humanvalue_audit_log_failures_total 指标
 
 设计要点：
 - 不依赖路由层手动调 audit_service.log，service 层方法被装饰后自动产生审计
@@ -150,7 +150,7 @@ def audit_action(action: str, resource_type: str = "evaluation"):
         - 业务方法成功返回后记录审计(P1-N3 修复: 失败也记录 *_failed 审计,
           含异常类型/消息, 供安全审计追查越权/非法操作)
         - actor_id 从 contextvar 或 kwargs 提取
-        - 审计写入失败不阻断业务, 仅记 agentvalue_audit_log_failures_total
+        - 审计写入失败不阻断业务, 仅记 humanvalue_audit_log_failures_total
     """
 
     def decorator(func):

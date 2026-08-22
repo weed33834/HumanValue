@@ -39,7 +39,7 @@ class AWSKMSProvider(KMSProvider):
         max_pool_connections: int = 20,
         max_retries: int = 5,
     ):
-        self._key_id = key_id  # alias/agentvalue-field-kek 或 key ARN
+        self._key_id = key_id  # alias/humanvalue-field-kek 或 key ARN
         self._region = region  # None 时从环境推断 (~/.aws/config / env)
         self._max_pool = max_pool_connections
         self._max_retries = max_retries

@@ -24,7 +24,7 @@ from core.config import Settings, get_settings
 
 logger = logging.getLogger(__name__)
 
-KEY_PREFIX = "agentvalue:jwt_blacklist:"
+KEY_PREFIX = "humanvalue:jwt_blacklist:"
 # Redis 故障时本地 LRU 镜像的最大条目数
 LOCAL_MIRROR_MAX_SIZE = 1000
 
@@ -132,7 +132,7 @@ class RedisTokenBlacklist:
     安全加固：
     - revoke 时同时写入进程内 LRU 镜像,保证 Redis 故障期间仍可拦截最近吊销
     - is_revoked Redis 故障时回退本地镜像,命中即拒绝；未命中才降级放行
-      并记录 agentvalue_token_blacklist_degraded_total 告警指标
+      并记录 humanvalue_token_blacklist_degraded_total 告警指标
     """
 
     def __init__(self, redis_url: str) -> None:
@@ -243,7 +243,7 @@ async def blacklist_all_user_tokens(user_id: str) -> int:
         now = int(time.time())
         # Redis 后端：RedisTokenBlacklist 使用 self._client
         if hasattr(token_blacklist, "_client") and token_blacklist._client:
-            key = f"agentvalue:user_revoke:{user_id}"
+            key = f"humanvalue:user_revoke:{user_id}"
             await token_blacklist._client.setex(key, 86400, str(now))  # 24h TTL
             logger.info("已吊销用户 %s 的所有 Token (Redis)", user_id)
             return 1
@@ -277,7 +277,7 @@ async def is_user_tokens_revoked(user_id: str, token_iat: int) -> bool:
     try:
         # Redis 后端
         if hasattr(token_blacklist, "_client") and token_blacklist._client:
-            key = f"agentvalue:user_revoke:{user_id}"
+            key = f"humanvalue:user_revoke:{user_id}"
             value = await token_blacklist._client.get(key)
             if value is None:
                 return False

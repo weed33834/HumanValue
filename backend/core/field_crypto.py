@@ -155,7 +155,7 @@ class FieldCipher:
                 # 生产环境 fail-closed,非生产降级返回原密文 (兼容旧数据)
                 from core.config import get_settings
 
-                if get_settings().agentvalue_env == "production":
+                if get_settings().humanvalue_env == "production":
                     raise
                 return ciphertext
 
@@ -218,7 +218,7 @@ class FieldCipher:
 
         未启用加密时返回 JSON 字符串（与密文同为 str 类型，DB 列类型一致）。
 
-        P1-11：生产环境（agentvalue_env == "production"）下加密失败直接 raise，
+        P1-11：生产环境（humanvalue_env == "production"）下加密失败直接 raise，
         不降级返回明文（避免敏感字段明文落库）；非生产环境保持降级行为（开发友好）。
         """
         from core.metrics import record_field_encryption
@@ -241,7 +241,7 @@ class FieldCipher:
             # P1-11：生产环境 fail-closed，不降级明文；非生产降级返回 JSON 字符串
             from core.config import get_settings
 
-            if get_settings().agentvalue_env == "production":
+            if get_settings().humanvalue_env == "production":
                 logger.error("字段加密失败且处于生产环境，拒绝降级明文落库")
                 raise
             logger.exception("字段加密失败，降级返回 JSON 字符串（非生产环境）")
@@ -344,7 +344,7 @@ def get_field_cipher() -> FieldCipher:
                 backend,
                 e,
             )
-            if settings.agentvalue_env == "production":
+            if settings.humanvalue_env == "production":
                 # 生产环境硬失败:不允许降级 (避免明文落库)
                 raise
             # 非生产降级到本地 (envelope_cipher=None)

@@ -186,7 +186,7 @@ class TestRedisTokenBlacklist:
     async def test_redis_failure_mirror_miss_degrades_and_records_metric(
         self, redis_blacklist, monkeypatch
     ):
-        """Redis 故障且镜像未命中，降级放行并记 agentvalue_token_blacklist_degraded_total"""
+        """Redis 故障且镜像未命中，降级放行并记 humanvalue_token_blacklist_degraded_total"""
         # 记录 metric 调用
         recorded = []
         from core import metrics as metrics_module

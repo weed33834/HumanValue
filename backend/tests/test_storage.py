@@ -106,7 +106,7 @@ def _mock_minio(bucket_exists=True):
     client.bucket_exists.return_value = bucket_exists
     with patch("minio.Minio", return_value=client):
         storage = S3Storage(
-            "minio.local:9000", "ak", "sk", "agentvalue-attachments", secure=False
+            "minio.local:9000", "ak", "sk", "humanvalue-attachments", secure=False
         )
     return storage, client
 
@@ -116,11 +116,11 @@ def test_s3_upload():
     url = storage.upload("dir/file.txt", b"hello", "text/plain")
     client.put_object.assert_called_once()
     args, kwargs = client.put_object.call_args
-    assert args[0] == "agentvalue-attachments"
+    assert args[0] == "humanvalue-attachments"
     assert args[1] == "dir/file.txt"
     assert kwargs["length"] == len(b"hello")
     assert kwargs["content_type"] == "text/plain"
-    assert url == "http://minio.local:9000/agentvalue-attachments/dir/file.txt"
+    assert url == "http://minio.local:9000/humanvalue-attachments/dir/file.txt"
 
 
 def test_s3_download():
@@ -130,7 +130,7 @@ def test_s3_download():
     client.get_object.return_value = resp
     data = storage.download("dir/file.txt")
     assert data == b"hello"
-    client.get_object.assert_called_once_with("agentvalue-attachments", "dir/file.txt")
+    client.get_object.assert_called_once_with("humanvalue-attachments", "dir/file.txt")
     resp.close.assert_called_once()
     resp.release_conn.assert_called_once()
 
@@ -139,7 +139,7 @@ def test_s3_delete():
     storage, client = _mock_minio()
     storage.delete("dir/file.txt")
     client.remove_object.assert_called_once_with(
-        "agentvalue-attachments", "dir/file.txt"
+        "humanvalue-attachments", "dir/file.txt"
     )
 
 
@@ -161,7 +161,7 @@ def test_s3_presigned_url():
 def test_s3_bucket_autocreate():
     # bucket 不存在时应自动创建
     storage, client = _mock_minio(bucket_exists=False)
-    client.make_bucket.assert_called_once_with("agentvalue-attachments")
+    client.make_bucket.assert_called_once_with("humanvalue-attachments")
 
 
 def test_s3_path_traversal_blocked():

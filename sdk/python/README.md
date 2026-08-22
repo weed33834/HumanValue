@@ -1,4 +1,4 @@
-# agentvalue
+# humanvalue
 
 HumanValue 开放 API 的官方 Python SDK（WS-3 集成与开放能力，对标 Stripe / Svix）。
 
@@ -19,7 +19,7 @@ pip install ./sdk/python
 ## 快速开始
 
 ```python
-from agentvalue import Client
+from humanvalue import Client
 
 # base_url 指向 HumanValue 服务端，api_key 在管理后台「API Key」页面创建
 client = Client(base_url="https://av.example.com", api_key="ak_xxx")
@@ -42,7 +42,7 @@ traces = client.list_traces(kind="llm")
 异步场景使用 `AsyncClient`（方法名相同，均为 `async def`）。
 
 ```python
-from agentvalue import AsyncClient
+from humanvalue import AsyncClient
 
 async with AsyncClient(base_url="https://av.example.com", api_key="ak_xxx") as client:
     me = await client.get_me()
@@ -58,7 +58,7 @@ async with AsyncClient(base_url="https://av.example.com", api_key="ak_xxx") as c
 **必须使用原始请求体**，不要 `json.loads` 后再 `json.dumps`（键序/空白差异会导致校验失败）。
 
 ```python
-from agentvalue import verify_webhook_signature
+from humanvalue import verify_webhook_signature
 
 raw_body = (await request.body()).decode("utf-8")
 signature = request.headers.get("X-HumanValue-Signature", "")
@@ -79,7 +79,7 @@ ok = verify_webhook_signature(
 ## SDK 目录
 
 ```
-sdk/python/agentvalue/
+sdk/python/humanvalue/
 ├── __init__.py    # 导出 Client / AsyncClient / verify_webhook_signature
 └── client.py      # 实现（httpx 同步 + 异步）
 ```

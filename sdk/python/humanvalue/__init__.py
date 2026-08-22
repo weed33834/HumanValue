@@ -3,7 +3,7 @@
 对标 Stripe / Svix：一个 API Key 门控的开放 API 客户端 + Webhook 签名校验工具。
 """
 
-from agentvalue.client import (
+from humanvalue.client import (
     HumanValueError,
     ApiError,
     AsyncClient,

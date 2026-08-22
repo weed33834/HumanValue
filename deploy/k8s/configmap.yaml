@@ -11,13 +11,13 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: agentvalue-config
+  name: humanvalue-config
   labels:
-    app.kubernetes.io/name: agentvalue
+    app.kubernetes.io/name: humanvalue
     app.kubernetes.io/component: backend
 data:
   # 运行环境标识: 仅 "production" 时启用生产安全校验(禁止 AUTH_DEMO_MODE 等)
-  AGENTVALUE_ENV: "production"
+  HUMANVALUE_ENV: "production"
   # 调试模式: 生产环境保持 false
   DEBUG: "false"
   # 演示模式: 生产必须 false(开启后允许通过 header 伪造身份,仅开发/测试用)
@@ -29,7 +29,7 @@ data:
   # 附件本地存储目录(降级路径;生产建议配置 S3_ENDPOINT 走对象存储/MinIO)
   ATTACHMENT_DIR: "/app/attachments"
   # CORS 允许来源(逗号分隔);改为实际前端域名(与 Ingress host 一致)
-  CORS_ORIGINS: "https://agentvalue.example.com"
+  CORS_ORIGINS: "https://humanvalue.example.com"
   # 数据库连接池参数(仅 PostgreSQL 生效,SQLite 使用 NullPool)
   DB_POOL_SIZE: "20"
   DB_MAX_OVERFLOW: "10"

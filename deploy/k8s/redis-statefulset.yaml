@@ -11,19 +11,19 @@ kind: StatefulSet
 metadata:
   name: redis
   labels:
-    app.kubernetes.io/name: agentvalue
+    app.kubernetes.io/name: humanvalue
     app.kubernetes.io/component: redis
 spec:
   serviceName: redis
   replicas: 1
   selector:
     matchLabels:
-      app.kubernetes.io/name: agentvalue
+      app.kubernetes.io/name: humanvalue
       app.kubernetes.io/component: redis
   template:
     metadata:
       labels:
-        app.kubernetes.io/name: agentvalue
+        app.kubernetes.io/name: humanvalue
         app.kubernetes.io/component: redis
     spec:
       terminationGracePeriodSeconds: 15
@@ -69,7 +69,7 @@ spec:
     - metadata:
         name: redis-data
         labels:
-          app.kubernetes.io/name: agentvalue
+          app.kubernetes.io/name: humanvalue
           app.kubernetes.io/component: redis
       spec:
         accessModes: ["ReadWriteOnce"]
@@ -83,12 +83,12 @@ kind: Service
 metadata:
   name: redis
   labels:
-    app.kubernetes.io/name: agentvalue
+    app.kubernetes.io/name: humanvalue
     app.kubernetes.io/component: redis
 spec:
   type: ClusterIP
   selector:
-    app.kubernetes.io/name: agentvalue
+    app.kubernetes.io/name: humanvalue
     app.kubernetes.io/component: redis
   ports:
     - name: redis

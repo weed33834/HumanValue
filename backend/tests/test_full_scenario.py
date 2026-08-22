@@ -17,7 +17,7 @@ import pytest
 from fastapi.testclient import TestClient
 
 # 演示账号凭据(由 seed-demo-users 创建)
-_DEMO_PASSWORD = "agentvalue123"
+_DEMO_PASSWORD = "humanvalue123"
 _ADMIN_EMAIL = "admin@humanvalue.ai"
 _MANAGER_EMAIL = "manager@humanvalue.ai"
 _EMPLOYEE_EMAIL = "employee@humanvalue.ai"

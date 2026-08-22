@@ -26,9 +26,9 @@ docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
 
 | 告警 | 阈值 | 严重度 | 窗口 | 指标 |
 |---|---|---|---|---|
-| EmpvalueEvaluationFailureRateHigh | 失败率 >5% | critical | 5m | `agentvalue_evaluation_failures_total` / `agentvalue_evaluations_total` |
-| EmpvalueEvaluationP99LatencyHigh | P99 >3s | warning | 5m | `agentvalue_evaluation_duration_seconds` |
-| EmpvalueLlmFailureRateHigh | 失败率 >10% | critical | 5m | `agentvalue_llm_requests_total` |
+| EmpvalueEvaluationFailureRateHigh | 失败率 >5% | critical | 5m | `humanvalue_evaluation_failures_total` / `humanvalue_evaluations_total` |
+| EmpvalueEvaluationP99LatencyHigh | P99 >3s | warning | 5m | `humanvalue_evaluation_duration_seconds` |
+| EmpvalueLlmFailureRateHigh | 失败率 >10% | critical | 5m | `humanvalue_llm_requests_total` |
 
 ---
 
@@ -40,11 +40,11 @@ docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
 
 ```promql
 (
-  sum(rate(agentvalue_evaluation_failures_total[5m]))
+  sum(rate(humanvalue_evaluation_failures_total[5m]))
   /
   clamp_min(
-    sum(rate(agentvalue_evaluations_total[5m]))
-    + sum(rate(agentvalue_evaluation_failures_total[5m])),
+    sum(rate(humanvalue_evaluations_total[5m]))
+    + sum(rate(humanvalue_evaluation_failures_total[5m])),
     0.001
   )
 ) > 0.05
@@ -54,8 +54,8 @@ docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
 
 ### 指标语义
 
-- `agentvalue_evaluations_total{status, model_tier}`:成功产出评估结果的计数,`status` 为评估终态(ai_drafted / manager_review / hr_audit / approved / rejected)。
-- `agentvalue_evaluation_failures_total{reason}`:评估任务失败计数,`reason` 三类:
+- `humanvalue_evaluations_total{status, model_tier}`:成功产出评估结果的计数,`status` 为评估终态(ai_drafted / manager_review / hr_audit / approved / rejected)。
+- `humanvalue_evaluation_failures_total{reason}`:评估任务失败计数,`reason` 三类:
   - `graph_error` —— 评估图执行返回错误(LLM 调用失败、护栏拦截等)
   - `no_result` —— 图执行完成但未生成 parsed_evaluation
   - `exception` —— 处理过程抛异常
@@ -66,7 +66,7 @@ docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
 
 ### 排查步骤
 
-1. Prometheus 查 `sum by (reason) (agentvalue_evaluation_failures_total)`,定位是哪类失败占主导。
+1. Prometheus 查 `sum by (reason) (humanvalue_evaluation_failures_total)`,定位是哪类失败占主导。
 2. `graph_error` 为主 → 多为 LLM 调用失败,跳到第 3 条告警排查 Provider;或护栏拦截,查 backend 日志 `grep "输入被拦截"`。
 3. `no_result` 为主 → LLM 返回了内容但解析失败,查 backend 日志 `grep "解析"` 与 `llm_raw_output`,多为模型输出不符合 JSON Schema。
 4. `exception` 为主 → 服务端异常,查 backend 日志 `grep "评估处理失败"`,看堆栈。
@@ -83,7 +83,7 @@ docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
 ```promql
 histogram_quantile(
   0.99,
-  sum by (le, model_tier) (rate(agentvalue_evaluation_duration_seconds_bucket[5m]))
+  sum by (le, model_tier) (rate(humanvalue_evaluation_duration_seconds_bucket[5m]))
 ) > 3
 ```
 
@@ -91,7 +91,7 @@ histogram_quantile(
 
 ### 指标语义
 
-`agentvalue_evaluation_duration_seconds{model_tier}`:单次评估从图执行到产出结果的耗时(秒),Histogram 默认桶。
+`humanvalue_evaluation_duration_seconds{model_tier}`:单次评估从图执行到产出结果的耗时(秒),Histogram 默认桶。
 
 ### 影响
 
@@ -99,9 +99,9 @@ histogram_quantile(
 
 ### 排查步骤
 
-1. Prometheus 查 `histogram_quantile(0.99, sum by (le, model_tier)(rate(agentvalue_evaluation_duration_seconds_bucket[5m])))`,看哪个 `model_tier` 慢。
+1. Prometheus 查 `histogram_quantile(0.99, sum by (le, model_tier)(rate(humanvalue_evaluation_duration_seconds_bucket[5m])))`,看哪个 `model_tier` 慢。
 2. L2/L3(本地模型)慢 → 检查 GPU 利用率(`nvidia-smi`),本地模型推理是瓶颈;考虑降档到 L0(云端)或扩容 GPU。
-3. L0(云端)慢 → 检查云端 API 限流 / 网络,Provider 重试会放大耗时;查 `agentvalue_llm_requests_total` 是否伴随失败率上升。
+3. L0(云端)慢 → 检查云端 API 限流 / 网络,Provider 重试会放大耗时;查 `humanvalue_llm_requests_total` 是否伴随失败率上升。
 4. 持续慢且无法降档 → 在 `docker-compose.prod.yml` 扩容 backend 副本(`--scale backend=N`),Redis 任务队列已就绪可分担。
 
 ---
@@ -114,9 +114,9 @@ histogram_quantile(
 
 ```promql
 (
-  sum(rate(agentvalue_llm_requests_total{status="error"}[5m]))
+  sum(rate(humanvalue_llm_requests_total{status="error"}[5m]))
   /
-  clamp_min(sum(rate(agentvalue_llm_requests_total[5m])), 0.001)
+  clamp_min(sum(rate(humanvalue_llm_requests_total[5m])), 0.001)
 ) > 0.10
 ```
 
@@ -124,7 +124,7 @@ histogram_quantile(
 
 ### 指标语义
 
-`agentvalue_llm_requests_total{model_tier, status}`:LLM 调用计数,`status` 为 `success`(成功)或 `error`(重试耗尽失败)。
+`humanvalue_llm_requests_total{model_tier, status}`:LLM 调用计数,`status` 为 `success`(成功)或 `error`(重试耗尽失败)。
 
 ### 影响
 
@@ -132,7 +132,7 @@ LLM 调用失败直接导致评估 `graph_error` 失败,连锁触发第 1 条告
 
 ### 排查步骤
 
-1. Prometheus 查 `sum by (model_tier, status) (rate(agentvalue_llm_requests_total[5m]))`,定位故障档位。
+1. Prometheus 查 `sum by (model_tier, status) (rate(humanvalue_llm_requests_total[5m]))`,定位故障档位。
 2. L0(云端)失败 → 检查 API Key 是否失效 / 余额耗尽 / 触发速率限制;在 AdminModel 页面切换 Provider 配置或降档到本地。
 3. L2/L3(本地)失败 → 检查 LM Studio / 本地推理服务是否存活,`curl` 探测本地模型端点。
 4. 全档位失败 → 多半是网络或配置问题,查 backend `.env` 的模型配置段,确认 endpoint / key 正确。

@@ -31,7 +31,7 @@ def _ensure_secret_key(settings) -> str:
     1. settings.field_encryption_backend == "vault":从 Vault KV v2 读 jwt_key_path
     2. settings.jwt_secret_key (env):直接用
 
-    生产环境 (agentvalue_env=production):
+    生产环境 (humanvalue_env=production):
     - backend=vault 且 Vault 不可用:硬失败 (不降级明文)
     - backend != vault 且未配 jwt_secret_key:硬失败
 
@@ -47,7 +47,7 @@ def _ensure_secret_key(settings) -> str:
         return _jwt_secret_cache
 
     backend = (getattr(settings, "field_encryption_backend", "env") or "env").lower()
-    is_production = settings.agentvalue_env == "production"
+    is_production = settings.humanvalue_env == "production"
 
     # 1. 优先从 Vault KV v2 读
     if backend == "vault":

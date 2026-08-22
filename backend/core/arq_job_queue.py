@@ -26,7 +26,7 @@ logger = logging.getLogger(__name__)
 class ArqJobQueue(JobQueue):
     """arq 任务队列适配器:enqueue 入 arq,状态走 RedisJobQueue
 
-    与 RedisJobQueue 共享 Redis key 前缀(agentvalue:job:),状态查询接口完全兼容。
+    与 RedisJobQueue 共享 Redis key 前缀(humanvalue:job:),状态查询接口完全兼容。
     新增能力:enqueue 时入 arq 队列,worker 进程独立消费,失败自动重投+死信。
     """
 

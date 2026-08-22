@@ -3,14 +3,14 @@
 # -----------------------------------------------------------------------------
 # 将外部流量路由到前端(SPA / 静态资源)与后端(API / 健康 / 指标)。
 # 前置条件: 集群需已安装 Ingress 控制器(如 ingress-nginx),并确认 ingressClassName。
-# 将 host: agentvalue.example.com 改为实际域名;TLS 需配套证书(见下方注释)。
+# 将 host: humanvalue.example.com 改为实际域名;TLS 需配套证书(见下方注释)。
 # =============================================================================
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: agentvalue
+  name: humanvalue
   labels:
-    app.kubernetes.io/name: agentvalue
+    app.kubernetes.io/name: humanvalue
   annotations:
     # 以下为 ingress-nginx 控制器注解,若使用其他控制器(traefik/haproxy 等)请相应调整
     # 允许上传大附件(评测截图/语音/PDF 等)
@@ -23,15 +23,15 @@ metadata:
 spec:
   ingressClassName: nginx
   # TLS 配置(需先创建含证书的 Secret,如:
-  #   kubectl create secret tls agentvalue-tls -n agentvalue \
+  #   kubectl create secret tls humanvalue-tls -n humanvalue \
   #     --cert=tls.crt --key=tls.key
   # 或使用 cert-manager 自动签发)。取消注释后启用:
   # tls:
   #   - hosts:
-  #       - agentvalue.example.com
-  #     secretName: agentvalue-tls
+  #       - humanvalue.example.com
+  #     secretName: humanvalue-tls
   rules:
-    - host: agentvalue.example.com
+    - host: humanvalue.example.com
       http:
         paths:
           # API 接口直连后端(/api 及其子路径)

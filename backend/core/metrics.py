@@ -4,7 +4,7 @@ Prometheus 指标收集。
 业务代码只管调下面的埋点函数，label 拼装和命名集中在这里管，避免散落到各处拼写出错。
 setup_metrics(app) 把 prometheus_client 的 ASGI 应用挂到 /metrics，不走鉴权，方便 Prometheus 直接抓。
 
-指标统一以 agentvalue_ 为前缀。
+指标统一以 humanvalue_ 为前缀。
 """
 
 from __future__ import annotations
@@ -175,42 +175,42 @@ def _tenant_label() -> str:
 # 评估总数（按终态 status 与模型档位 model_tier 维度统计）
 # P3-5：加 tenant_id label，从 contextvar 自动填充，便于按租户聚合评估量。
 EVALUATIONS_TOTAL = Counter(
-    "agentvalue_evaluations_total",
+    "humanvalue_evaluations_total",
     "完成的评估总数",
     ["status", "model_tier", "tenant_id"],
 )
 
 # 评估耗时分布（按模型档位统计，单位：秒）
 EVALUATION_DURATION_SECONDS = Histogram(
-    "agentvalue_evaluation_duration_seconds",
+    "humanvalue_evaluation_duration_seconds",
     "单次评估耗时（秒）",
     ["model_tier"],
 )
 
 # 审批状态流转次数（记录 action 与 from/to 状态，便于分析审批漏斗）
 APPROVAL_TRANSITIONS_TOTAL = Counter(
-    "agentvalue_approval_transitions_total",
+    "humanvalue_approval_transitions_total",
     "审批状态流转次数",
     ["action", "from_status", "to_status"],
 )
 
 # 反馈/申诉总数（按类型统计：feedback / appeal）
 FEEDBACK_TOTAL = Counter(
-    "agentvalue_feedback_total",
+    "humanvalue_feedback_total",
     "员工反馈与申诉数",
     ["type"],
 )
 
 # LLM 调用次数（按模型档位与调用状态统计：success / error / timeout 等）
 LLM_REQUESTS_TOTAL = Counter(
-    "agentvalue_llm_requests_total",
+    "humanvalue_llm_requests_total",
     "LLM 调用次数",
     ["model_tier", "status"],
 )
 
 # 当前活跃评估任务数（异步评估 job 的实时存量，Gauge 可升可降）
 ACTIVE_JOBS = Gauge(
-    "agentvalue_active_jobs",
+    "humanvalue_active_jobs",
     "当前活跃评估任务数",
 )
 
@@ -218,34 +218,34 @@ ACTIVE_JOBS = Gauge(
 # reason: graph_error 图执行返回错误 / no_result 未生成评估结果 / exception 处理异常
 # P3-5：加 tenant_id label，便于按租户聚合失败率告警。
 EVALUATION_FAILURES_TOTAL = Counter(
-    "agentvalue_evaluation_failures_total",
+    "humanvalue_evaluation_failures_total",
     "评估失败数",
     ["reason", "tenant_id"],
 )
 
 # JWT 黑名单降级放行次数（Redis 故障时回退本地镜像未命中的次数）
 TOKEN_BLACKLIST_DEGRADED_TOTAL = Counter(
-    "agentvalue_token_blacklist_degraded_total",
+    "humanvalue_token_blacklist_degraded_total",
     "JWT 黑名单 Redis 故障降级放行次数",
 )
 
 # 审计日志写入次数（按 action 统计）
 # P3-5：加 tenant_id label，便于按租户聚合审计量做合规报表。
 AUDIT_LOG_TOTAL = Counter(
-    "agentvalue_audit_log_total",
+    "humanvalue_audit_log_total",
     "审计日志写入次数",
     ["action", "tenant_id"],
 )
 
 # 审计日志写入失败次数（审计异常不阻断业务，但需告警）
 AUDIT_LOG_FAILURES_TOTAL = Counter(
-    "agentvalue_audit_log_failures_total",
+    "humanvalue_audit_log_failures_total",
     "审计日志写入失败次数",
 )
 
 # 字段级加解密操作次数（按 status 统计：success / failure）
 FIELD_ENCRYPTION_TOTAL = Counter(
-    "agentvalue_field_encryption_total",
+    "humanvalue_field_encryption_total",
     "字段级加解密操作次数",
     ["status"],
 )
@@ -254,24 +254,24 @@ FIELD_ENCRYPTION_TOTAL = Counter(
 # P1-4：保留旧 Counter 名（向后兼容测试与既有查询），同时新增独立 encrypt 失败 Counter，
 # 让加密与解密失败能分别告警（加密失败=明文泄漏风险，解密失败=数据损坏/密钥轮换问题）。
 FIELD_DECRYPT_FAILURES_TOTAL = Counter(
-    "agentvalue_field_decrypt_failures_total",
+    "humanvalue_field_decrypt_failures_total",
     "字段级解密失败次数（AES-GCM 解密失败、密钥不匹配或数据损坏等）",
 )
 FIELD_ENCRYPTION_FAILURES_TOTAL = Counter(
-    "agentvalue_field_encryption_failures_total",
+    "humanvalue_field_encryption_failures_total",
     "字段级加密失败次数（AES-GCM 加密异常，生产环境直接抛出不降级）",
 )
 
 # 护栏检查次数（按 type 与 result 统计：input/output × clean/blocked）
 GUARD_CHECKS_TOTAL = Counter(
-    "agentvalue_guard_checks_total",
+    "humanvalue_guard_checks_total",
     "护栏检查次数",
     ["type", "result"],
 )
 
 # 护栏误报次数（命中但实际为正常内容，按 type 统计）
 GUARD_FALSE_POSITIVES_TOTAL = Counter(
-    "agentvalue_guard_false_positives_total",
+    "humanvalue_guard_false_positives_total",
     "护栏误报次数",
     ["type"],
 )
@@ -280,14 +280,14 @@ GUARD_FALSE_POSITIVES_TOTAL = Counter(
 
 # 视觉调用次数（按档位与状态统计）
 LLM_VISION_CALLS_TOTAL = Counter(
-    "agentvalue_llm_vision_calls_total",
+    "humanvalue_llm_vision_calls_total",
     "LLM 视觉调用次数",
     ["model_tier", "status"],
 )
 
 # Provider 健康度评分（0-100，由 ModelRouter 基于最近 health_check 成功率与平均响应时间计算）
 PROVIDER_HEALTH_SCORE = Gauge(
-    "agentvalue_provider_health_score",
+    "humanvalue_provider_health_score",
     "Provider 健康度评分（0-100）",
     ["model_tier"],
 )
@@ -295,7 +295,7 @@ PROVIDER_HEALTH_SCORE = Gauge(
 # LLM token 用量（按模型档位、模型名、方向 prompt|completion 统计，供成本与配额分析）
 # P1 增强: 加 tenant_id label,便于按租户聚合 token 成本做配额告警与计费
 LLM_TOKEN_USAGE_TOTAL = Counter(
-    "agentvalue_llm_token_usage_total",
+    "humanvalue_llm_token_usage_total",
     "LLM token 用量",
     ["tier", "model", "direction", "tenant_id"],
 )
@@ -303,21 +303,21 @@ LLM_TOKEN_USAGE_TOTAL = Counter(
 # WS-4 租户查询守卫：检测到缺失 tenant_id 谓词的 SELECT 次数（warn 模式只计数不拦截）
 # 切 enforce 前应先把该指标压到 0
 TENANT_GUARD_VIOLATIONS_TOTAL = Counter(
-    "agentvalue_tenant_guard_violations_total",
+    "humanvalue_tenant_guard_violations_total",
     "缺失租户过滤条件的查询次数",
     ["tables"],
 )
 
 # WS-4 分布式限流：被 Redis 令牌桶拒绝的请求数（按维度统计）
 RATE_LIMIT_REJECTED_TOTAL = Counter(
-    "agentvalue_rate_limit_rejected_total",
+    "humanvalue_rate_limit_rejected_total",
     "分布式限流拒绝请求次数",
     ["dimension"],
 )
 
 # WS-4 分布式限流：Redis 不可用降级到进程内限流的次数
 RATE_LIMIT_DEGRADED_TOTAL = Counter(
-    "agentvalue_rate_limit_degraded_total",
+    "humanvalue_rate_limit_degraded_total",
     "分布式限流 Redis 故障降级次数",
 )
 

@@ -165,11 +165,11 @@ def _resolve_collection_name(
     """解析 collection 名称：未指定时使用租户默认 KB collection 名
 
     H5: 强制校验 collection_name 归属当前租户, 防止跨租户访问知识库。
-    只允许使用租户默认 collection (agentvalue_kb_{tenant_id}) 或以该前缀
+    只允许使用租户默认 collection (humanvalue_kb_{tenant_id}) 或以该前缀
     开头的子 collection; 用户提供的其它 collection 一律拒绝。
     """
     # 租户 collection 前缀 (租户隔离边界)
-    tenant_prefix = f"agentvalue_kb_{tenant_id}"
+    tenant_prefix = f"humanvalue_kb_{tenant_id}"
 
     # 若调用方显式指定了 collection_name, 必须归属当前租户, 否则拒绝访问
     if collection_name:
@@ -495,11 +495,11 @@ def _get_multi_vector_service(
 ) -> MultiVectorSearchService:
     """获取当前租户的 MultiVectorSearchService 实例
 
-    collection 前缀按租户隔离（agentvalue_mv_{tenant_id}），避免跨租户数据串扰，
+    collection 前缀按租户隔离（humanvalue_mv_{tenant_id}），避免跨租户数据串扰，
     与混合检索的租户隔离策略保持一致。
     """
     kb_store = app_state.get_kb_store(tenant_id)
-    collection_prefix = f"agentvalue_mv_{tenant_id}"
+    collection_prefix = f"humanvalue_mv_{tenant_id}"
     return MultiVectorSearchService(
         kb_store=kb_store,
         settings=app_state.settings,
