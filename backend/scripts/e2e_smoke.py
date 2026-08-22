@@ -147,11 +147,12 @@ class E2ERunner:
 
         def _metrics() -> tuple[bool, str]:
             r = self.client.get(f"{self.base}/metrics")
+            # 同时校验状态码与指标内容(应用前缀或 prometheus 默认采集器), 防止
+            # 空响应体被误判为健康
+            has_metrics = b"humanvalue_" in r.content or b"python_info" in r.content
             return (
-                r.status_code == 200
-                and b"python_info" in r.content
-                or r.status_code == 200,
-                f"status={r.status_code} bytes={len(r.content)}",
+                r.status_code == 200 and has_metrics,
+                f"status={r.status_code} bytes={len(r.content)} metrics={has_metrics}",
             )
 
         self.check("GET /health 返回 200", "infra", _health)

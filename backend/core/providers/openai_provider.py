@@ -186,9 +186,9 @@ class OpenAICompatibleProvider(BaseProvider):
         if tools:
             payload["tools"] = tools
 
-        # 重试逻辑: API 代理可能返回 429 (rate limit / authorization failed)
-        max_retries = 3
-        for attempt in range(max_retries + 1):
+        # 重试逻辑: 与 _retry() 共用 MAX_RETRIES; 判定同时接受异常类型(RateLimitError)
+        # 与字符串信号(部分代理网关以非常规形态返回限流), 保守取并集保持既有语义
+        for attempt in range(MAX_RETRIES + 1):
             try:
                 stream = await self.client.chat.completions.create(**payload)
                 # M23/M18 鲁棒性: 空闲超时包装, 防止上游慢/挂导致聊天无限阻塞
@@ -243,14 +243,18 @@ class OpenAICompatibleProvider(BaseProvider):
                 raise
             except Exception as e:
                 err_str = str(e)
-                is_rate_limit = "429" in err_str or "rate" in err_str.lower()
-                if is_rate_limit and attempt < max_retries:
+                is_rate_limit = (
+                    isinstance(e, RateLimitError)
+                    or "429" in err_str
+                    or "rate" in err_str.lower()
+                )
+                if is_rate_limit and attempt < MAX_RETRIES:
                     wait = 2**attempt  # 1s, 2s, 4s
                     logger.warning(
                         "LLM 请求被限流(429), %ds 后重试 (attempt %d/%d): %s",
                         wait,
                         attempt + 1,
-                        max_retries,
+                        MAX_RETRIES,
                         err_str[:100],
                     )
                     await asyncio.sleep(wait)

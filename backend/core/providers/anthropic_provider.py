@@ -34,7 +34,6 @@ logger = logging.getLogger(__name__)
 
 _API_BASE = "https://api.anthropic.com"
 _API_VERSION = "2023-06-01"
-_MAX_RETRIES = 3
 _REQUEST_TIMEOUT = 60.0
 
 

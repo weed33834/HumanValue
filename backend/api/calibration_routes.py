@@ -574,7 +574,6 @@ async def batch_adjust_calibration_items(
                 }
             )
             continue
-        item.calibrated_score
         item.calibrated_score = spec.calibrated_score
         if spec.adjustment_reason is not None:
             item.adjustment_reason = spec.adjustment_reason

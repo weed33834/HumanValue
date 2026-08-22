@@ -247,18 +247,13 @@ class KbSyncService:
                     )
                 elif source.source_type == "url":
                     new_files = await self._scan_url(source.config.get("url", ""))
-                elif source.source_type == "s3":
-                    # S3 扫描占位（需配置 boto3，此处返回空列表降级）
-                    logger.warning("S3 数据源扫描暂未实现，跳过")
-                    new_files = []
-                elif source.source_type == "database":
-                    logger.warning("Database 数据源扫描暂未实现，跳过")
-                    new_files = []
-                elif source.source_type == "git":
-                    logger.warning("Git 数据源扫描暂未实现，跳过")
-                    new_files = []
                 else:
-                    new_files = []
+                    # S3/Database/Git 等类型尚未实现扫描器: 显式失败并写入日志,
+                    # 而不是静默返回空列表伪装成一次"成功同步"
+                    raise ValueError(
+                        f"数据源类型 {source.source_type!r} 的扫描器暂未实现, "
+                        f"当前仅支持 local_dir / url"
+                    )
 
                 # 检测变更
                 changes = self._detect_changes(new_files, old_files)

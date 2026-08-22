@@ -209,6 +209,11 @@ def _build_trace_spans(
         }
     )
 
+    # 全部 span 时长均为启发式估算(无真实分项埋点),统一打上 estimated 标记,
+    # 前端渲染 Gantt 时应明示"估算值"而非当作精确耗时
+    for span in spans:
+        span.setdefault("attributes", {})["estimated"] = True
+
     return spans
 
 
@@ -395,7 +400,7 @@ async def get_evaluation_trace(
                 ),
             },
         },
-        # P1-2: 节点级 spans,对标 Langfuse trace 节点
+        # P1-2: 节点级 spans,对标 Langfuse trace 节点(时长为估算值,见 attributes.estimated)
         "spans": spans,
         # P1-2: 时间线渲染所需的总览信息
         "timeline": {
@@ -403,6 +408,7 @@ async def get_evaluation_trace(
             "total_ms": total_ms,
             "span_count": len(spans),
             "failed_count": failed_count,
+            "durations_estimated": True,
         },
         "langfuse_hint": (
             "若已配置 Langfuse,可在 Langfuse UI 按 evaluation_id 搜索 trace,"
@@ -434,13 +440,10 @@ async def system_health(
         circuit_states = {"error": str(e)}
 
     # Health Cache (通过 model_router 间接获取)
-    hardware_report: Dict[str, Any] = {}
-    try:
-        # 不直接依赖 app_state,通过 settings 构造临时 router 取报告
-        # (避免循环依赖,实际生产应在 app_state 层暴露)
-        hardware_report = {"note": "通过 GET /admin/model-status 获取详细硬件报告"}
-    except Exception:
-        pass
+    # 硬件详情不在本端点重复实现,统一由 /admin/model-status 提供
+    hardware_report: Dict[str, Any] = {
+        "note": "通过 GET /admin/model-status 获取详细硬件报告"
+    }
 
     # MCP
     mcp_status: Dict[str, Any] = {}

@@ -35,7 +35,6 @@ logger = logging.getLogger(__name__)
 
 _API_BASE = "https://generativelanguage.googleapis.com"
 _API_VERSION = "v1beta"
-_MAX_RETRIES = 3
 _REQUEST_TIMEOUT = 60.0
 
 # Gemini finish_reason → OpenAI 风格

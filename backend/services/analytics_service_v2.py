@@ -381,8 +381,8 @@ class AnalyticsServiceV2:
         try:
             now = datetime.now(timezone.utc)
             start = now - timedelta(days=_ANOMALY_LOOKBACK_DAYS)
-            # 按天聚合 total_tokens
-            day_col = func.strftime("%Y-%m-%d", ConversationMetrics.timestamp)
+            # 按天聚合 total_tokens(func.date 跨 SQLite/PG 方言)
+            day_col = func.date(ConversationMetrics.timestamp)
             stmt = (
                 select(
                     day_col.label("day"),
@@ -451,8 +451,9 @@ class AnalyticsServiceV2:
             return model.user_id
         if group_by == "agent":
             return model.agent_id
-        # 默认按天
-        return func.strftime("%Y-%m-%d", model.timestamp)
+        # 默认按天: func.date 在 SQLite 与 PostgreSQL 下均为原生日期函数,
+        # 替换此前仅 SQLite 可用的 strftime 方言写法
+        return func.date(model.timestamp)
 
     @staticmethod
     def _format_key(key: Any, group_by: str) -> str:
