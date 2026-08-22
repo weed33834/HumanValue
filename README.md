@@ -16,7 +16,7 @@
   <img src="https://img.shields.io/badge/FastAPI-0.139+-009688?logo=fastapi&logoColor=white" alt="FastAPI" />
   <img src="https://img.shields.io/badge/Vue_3-4FC08D?logo=vuedotjs&logoColor=white" alt="Vue 3" />
   <img src="https://img.shields.io/badge/LangGraph-agent-FF6B6B" alt="LangGraph" />
-  <a href="CHANGELOG.md"><img src="https://img.shields.io/badge/version-1.0.6-blue.svg" alt="Version 1.0.6" /></a>
+  <a href="CHANGELOG.md"><img src="https://img.shields.io/badge/version-1.0.7-blue.svg" alt="Version 1.0.7" /></a>
 </p>
 
 <p align="center">
