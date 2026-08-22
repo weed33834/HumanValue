@@ -2,7 +2,7 @@
 
 > 状态: Draft (已通过真实联网研究 + 完整代码阅读产出)
 > 日期: 2026-07-12
-> 关联: [DEVELOPMENT-PLAN.md](./DEVELOPMENT-PLAN.md)、[AGENTS.md](../../AI/AGENTS.md)
+> 关联: [DEVELOPMENT-PLAN.md](./DEVELOPMENT-PLAN.md)、[AGENTS.md](../AGENTS.md)
 
 ## 一、研究依据(真实联网搜索)
 

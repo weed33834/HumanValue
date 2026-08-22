@@ -3,6 +3,16 @@
 本文件记录 HumanValue 所有显著变更,格式遵循 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/),
 版本号遵循 [语义化版本](https://semver.org/lang/zh-CN/)。
 
+## [v1.0.10] - 2026-08-22
+
+### 全量审计收尾: 文档核查
+
+- 35 个 markdown 文件全量扫描: 内链唯一断链已修复
+  (UPGRADE-DESIGN.md 引用外部仓库路径 `../../AI/AGENTS.md` → 指向本仓库 AGENTS.md);
+  CHANGELOG 中旧品牌名均为变更记录的正确表述,非残留。
+- AGENTS.md 测试规模声明与实际同步(约 1900 例)。
+- 审计结论: 文档层无虚假声明;README 三语的克隆地址/徽章/文档表此前各批次均已校正。
+
 ## [v1.0.9] - 2026-08-22
 
 ### 全量审计第四批: 质量门禁爬坡 (覆盖率 60% + ruff 规则强制化)
