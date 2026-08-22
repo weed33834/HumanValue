@@ -92,7 +92,7 @@ ldap3>=2.9
 apscheduler>=3.10.0
 # ====== 可选依赖 (未安装时对应功能自动降级) ======
 # Anthropic Claude provider (未安装时该 provider 不可用)
-anthropic>=0.40
+anthropic>=0.123.0
 # Google Gemini provider (未安装时该 provider 不可用)
 google-generativeai>=0.8
 # Ollama 本地模型 provider (未安装时该 provider 不可用)
