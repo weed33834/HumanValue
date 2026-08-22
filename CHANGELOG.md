@@ -3,6 +3,17 @@
 本文件记录 HumanValue 所有显著变更,格式遵循 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/),
 版本号遵循 [语义化版本](https://semver.org/lang/zh-CN/)。
 
+## [v1.0.3] - 2026-08-22
+
+### CI 加固与协作规范重写
+
+- **Dependabot 自动合并收紧**: 仅允许 semver-patch 自动合并(minor 一律人工审查);
+  移除"无检查直接合并"路径——检查尚未注册时一律等待,超时则放弃合并而非盲合。
+- **AGENTS.md 重写**: 由 602 行通用 AI 治理模板精简为项目专属工程规范(10 条 P0 红线),
+  移除对不存在文件(PROJECT.md/sync_rules.py)与外部规则仓库(/workspace/AI-rule、AI-RULE.git)的引用。
+- **Python 版本口径统一**: 明确运行时下限 3.11+(README/AGENTS.md)、CI 验证 3.12、
+  ruff target py310 仅为语法解析下限并在 pyproject 注释澄清,消除四处口径冲突。
+
 ## [v1.0.2] - 2026-08-22
 
 ### 品牌残留全量清理 (AgentValue → HumanValue)
@@ -34,4 +45,7 @@
 - **历史重建**: 开源前所有提交压缩为单个基线提交,旧历史不再对外呈现。
 - 后续变更自 v1.0.1 起,按语义化版本递增尾数补丁号。
 
+[v1.0.3]: https://github.com/weed33834/HumanValue/releases/tag/v1.0.3
+[v1.0.2]: https://github.com/weed33834/HumanValue/releases/tag/v1.0.2
+[v1.0.1]: https://github.com/weed33834/HumanValue/releases/tag/v1.0.1
 [v1.0.0]: https://github.com/weed33834/HumanValue/releases/tag/v1.0.0

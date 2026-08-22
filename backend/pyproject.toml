@@ -1,7 +1,8 @@
 [tool.ruff]
 # P2-8: ruff 配置统一到 pyproject.toml,删除 backend/ruff.toml。
 # - line-length=100 与团队风格一致;超长由 format 处理(ignore E501)
-# - target-version=py310 锁定最低支持版本,避免使用更高版本语法
+# - target-version=py310 仅为 ruff 的语法解析下限(不解析更高版本语法),
+#   不代表运行时支持下限;运行时口径见 README:Python 3.11+,CI 验证版本为 3.12
 # - select 取原 ruff.toml 实际生效的 E/F/W(渐进入口);
 #   更激进的 I/B/UP/SIM/RUF 规则集在历史代码上会产生 4800+ 噪音
 #   (主要是 RUF001/002/003 中文全角标点、UP006/UP045 Optional/List 现代化、
