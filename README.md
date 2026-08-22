@@ -16,7 +16,7 @@
   <img src="https://img.shields.io/badge/FastAPI-0.139+-009688?logo=fastapi&logoColor=white" alt="FastAPI" />
   <img src="https://img.shields.io/badge/Vue_3-4FC08D?logo=vuedotjs&logoColor=white" alt="Vue 3" />
   <img src="https://img.shields.io/badge/LangGraph-agent-FF6B6B" alt="LangGraph" />
-  <a href="CHANGELOG.md"><img src="https://img.shields.io/badge/version-1.0.3-blue.svg" alt="Version 1.0.3" /></a>
+  <a href="CHANGELOG.md"><img src="https://img.shields.io/badge/version-1.0.4-blue.svg" alt="Version 1.0.4" /></a>
 </p>
 
 <p align="center">
@@ -108,6 +108,8 @@ See the [Demo Showcase](docs/demo-showcase.md) for the complete recorded walkthr
 | [Error Codes](docs/error-codes.md) | Unified error code handbook |
 | [Agent Pitfalls](docs/agent-pitfalls.md) | Common pitfalls & regression gates |
 | [Launch Checklist](docs/launch-checklist.md) | Pre-release verification |
+| [Enterprise & Academia Adoption](docs/adoption-enterprise-academia.md) | Rollout plan for enterprises & universities |
+| [Employee Rights & Compliance](docs/compliance-employee-rights.md) | PIPL/GDPR automated-decision compliance |
 | [Changelog](CHANGELOG.md) | Version history |
 
 ## Repositories

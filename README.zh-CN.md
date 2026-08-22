@@ -16,7 +16,7 @@
   <img src="https://img.shields.io/badge/FastAPI-0.139+-009688?logo=fastapi&logoColor=white" alt="FastAPI" />
   <img src="https://img.shields.io/badge/Vue_3-4FC08D?logo=vuedotjs&logoColor=white" alt="Vue 3" />
   <img src="https://img.shields.io/badge/LangGraph-agent-FF6B6B" alt="LangGraph" />
-  <a href="CHANGELOG.md"><img src="https://img.shields.io/badge/version-1.0.3-blue.svg" alt="版本 1.0.3" /></a>
+  <a href="CHANGELOG.md"><img src="https://img.shields.io/badge/version-1.0.4-blue.svg" alt="版本 1.0.4" /></a>
 </p>
 
 <p align="center">
@@ -108,6 +108,8 @@ python -m eval.evaluate --mock
 | [错误码手册](docs/error-codes.md) | 统一错误码与排查 |
 | [智能体陷阱与防护](docs/agent-pitfalls.md) | 常见坑与防复发 |
 | [上线就绪检查清单](docs/launch-checklist.md) | 发布前逐项验证 |
+| [企业与高校落地方案](docs/adoption-enterprise-academia.md) | 分阶段落地路线与集成清单 |
+| [员工权利与算法合规](docs/compliance-employee-rights.md) | PIPL/GDPR 自动化决策合规指引 |
 | [更新日志](CHANGELOG.md) | 版本历史 |
 
 ## 仓库
