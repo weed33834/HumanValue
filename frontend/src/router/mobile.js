@@ -110,6 +110,15 @@ function buildRoleRoutes() {
     },
   })
 
+  // 兜底：未适配移动端的路径 → 桌面端引导页（提供 ?desktop=1 等价路径跳转），
+  // 避免移动端用户深链到未适配页面时直接落到桌面端 404
+  routes.push({
+    path: '/m/:pathMatch(.*)*',
+    name: 'MobilePlaceholder',
+    component: () => import('@/views/mobile/PlaceholderView.vue'),
+    meta: { title: '前往桌面端' },
+  })
+
   return routes
 }
 

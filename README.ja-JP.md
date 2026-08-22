@@ -15,7 +15,7 @@
   <img src="https://img.shields.io/badge/Node-20+-339933?logo=nodedotjs&logoColor=white" alt="Node 20+" />
   <img src="https://img.shields.io/badge/FastAPI-0.139+-009688?logo=fastapi&logoColor=white" alt="FastAPI" />
   <img src="https://img.shields.io/badge/Vue_3-4FC08D?logo=vuedotjs&logoColor=white" alt="Vue 3" />
-  <a href="CHANGELOG.md"><img src="https://img.shields.io/badge/version-1.0.5-blue.svg" alt="バージョン 1.0.5" /></a>
+  <a href="CHANGELOG.md"><img src="https://img.shields.io/badge/version-1.0.6-blue.svg" alt="バージョン 1.0.6" /></a>
 </p>
 
 <p align="center">

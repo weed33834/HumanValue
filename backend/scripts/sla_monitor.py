@@ -235,8 +235,10 @@ def generate_sla_report(
 ) -> dict:
     """
     生成完整 SLA 报告 dict。appeals 为空时调用造数函数生成 weeks 周数据。
+    data_source 标记数据来源("real"/"synthetic"),渲染层据此加合成数据警示。
     """
-    if appeals is None or not appeals:
+    synthetic = appeals is None or not appeals
+    if synthetic:
         appeals = generate_appeals(weeks=weeks)
 
     sla_result = compute_sla(appeals, sla_hours=SLA_HOURS, now=now)
@@ -259,6 +261,7 @@ def generate_sla_report(
 
     return {
         "generated_at": datetime.now(timezone.utc).isoformat(),
+        "data_source": "synthetic" if synthetic else "real",
         "weeks": week_labels,
         "sla_hours": SLA_HOURS,
         "total_appeals": sla_result["total"],
@@ -283,6 +286,13 @@ def render_markdown(report: dict) -> str:
     s = report["summary"]
     lines.append("# HumanValue 申诉处理 SLA 月报")
     lines.append("")
+    if report.get("data_source") == "synthetic":
+        lines.append("> ⚠️ **数据来源：内置合成数据（演示/联调用）。**")
+        lines.append(
+            "> 本报告全部结论基于脚本造数,不代表任何真实申诉数据;"
+            "生产使用请通过 `--input <appeals.json>` 传入真实记录。"
+        )
+        lines.append("")
     lines.append(f"> 生成时间：{report['generated_at']}")
     lines.append(f"> 覆盖周次：{', '.join(report['weeks'])}")
     lines.append(f"> SLA 标准：{report['sla_hours']} 小时内响应/解决")
@@ -407,12 +417,25 @@ def main(argv: list[str] | None = None) -> int:
         help="markdown 摘要输出目录，默认 <repo>/docs/",
     )
     parser.add_argument(
+        "--input",
+        default=None,
+        help="真实申诉记录 JSON 数组路径;缺省时使用内置合成数据(报告将标注 SYNTHETIC)",
+    )
+    parser.add_argument(
         "--seed", type=int, default=20260616, help="造数随机种子，默认 20260616"
     )
     args = parser.parse_args(argv)
 
-    appeals = generate_appeals(weeks=args.weeks, seed=args.seed)
-    report = generate_sla_report(appeals=appeals, weeks=args.weeks)
+    if args.input:
+        input_path = Path(args.input)
+        if not input_path.exists():
+            print(f"输入文件不存在: {input_path}")
+            return 2
+        appeals = json.loads(input_path.read_text(encoding="utf-8"))
+        report = generate_sla_report(appeals=appeals, weeks=args.weeks)
+    else:
+        appeals = generate_appeals(weeks=args.weeks, seed=args.seed)
+        report = generate_sla_report(appeals=appeals, weeks=args.weeks)
 
     output_dir = Path(args.output)
     output_dir.mkdir(parents=True, exist_ok=True)
@@ -429,6 +452,8 @@ def main(argv: list[str] | None = None) -> int:
     print(f"Markdown 报告已写入: {md_path}")
 
     s = report["summary"]
+    if report.get("data_source") == "synthetic":
+        print("⚠️ 当前使用内置合成数据,结论仅用于演示/联调;真实监控请 --input 传入记录")
     print(f"\n申诉总数: {report['total_appeals']}")
     print(f"  达成: {s['met']} | 超时: {s['breached']} | pending: {s['pending']}")
     print(f"  SLA 达成率: {s['achievement_rate']:.2f}%")

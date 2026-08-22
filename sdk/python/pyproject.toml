@@ -18,6 +18,3 @@ dev = ["pytest>=7"]
 
 [tool.setuptools]
 packages = ["humanvalue"]
-
-[tool.pytest.ini_options]
-testpaths = ["tests"]

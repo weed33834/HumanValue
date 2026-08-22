@@ -3,6 +3,33 @@
 本文件记录 HumanValue 所有显著变更,格式遵循 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/),
 版本号遵循 [语义化版本](https://semver.org/lang/zh-CN/)。
 
+## [v1.0.6] - 2026-08-22
+
+### 全量审计第一批: 虚假实现与弱实现修复
+
+对全部 456 个后端文件 / 132 个前端文件 / SDK / 脚本 / 部署清单完成虚假实现扫描,
+本批修复确认的问题(合法降级器如 MockProvider/DummyIMAdapter 经裁定保留):
+
+- **kb_sync_service**: S3/Database/Git 数据源此前静默返回空列表并记 success;
+  现显式抛错并落 failed 状态,不再伪装成功同步
+- **admin/debug**: 7 个 trace span 时长为启发式估算,现统一打 `estimated` 标记
+  并在 timeline 增加 `durations_estimated`; 移除 hardware_report 的死 try/except
+- **engagement_routes**: 删除拼写错误路由 `/recognizations`(零引用零测试)
+- **calibration_routes**: 删除 `item.calibrated_score` 裸表达式死代码
+- **e2e_smoke**: `/metrics` 断言因运算符优先级恒真,修复为同时校验状态码与指标内容
+- **analytics_service_v2**: 按天分组由 SQLite 方言 strftime 改为跨方言 func.date,
+  修复 PostgreSQL 下聚合报错的隐患
+- **openai_provider**: 流式重试与通用 `_retry` 统一使用 MAX_RETRIES 与 RateLimitError
+  类型判定;删除 anthropic/gemini provider 未使用的 `_MAX_RETRIES` 死常量
+- **db_backup**: 恢复验证失败现写入 critical 告警并尝试外发通知(原为 TODO 仅记日志)
+- **llm_judge**: 文档如实声明能力边界——被评对象固定由 MockProvider 生成,
+  不构成对真实 LLM 的端到端评测
+- **run_fairness_monthly / sla_monitor**: 合成数据月报现在显著标注 SYNTHETIC 横幅,
+  新增 `--input` 支持传入真实记录;避免造数报告被误读为真实审计结论
+- **前端 mobile 路由**: PlaceholderView 此前为零引用孤儿组件,现挂载为 `/m/*`
+  兜底引导页(深链未适配页面时提供桌面端等价路径跳转),配套测试保留有效
+- **sdk/python**: 移除指向不存在 tests 目录的 pytest 配置
+
 ## [v1.0.5] - 2026-08-22
 
 ### 自动化: 镜像同步 + 版本一致性门禁

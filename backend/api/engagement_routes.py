@@ -275,47 +275,6 @@ async def create_recognition(
     return {"recognition_id": rec.recognition_id, "status": "created"}
 
 
-@router.get("/recognizations", response_model=Dict[str, Any])
-async def list_recognizations(
-    to_user_id: Optional[str] = None,
-    from_user_id: Optional[str] = None,
-    limit: int = 50,
-    role: Role = Depends(
-        require_role(Role.EMPLOYEE, Role.MANAGER, Role.HR, Role.ADMIN, Role.BOSS)
-    ),
-    session: AsyncSession = Depends(get_db),
-):
-    """查询认可动态流"""
-    conditions = [Recognition.tenant_id == _tenant(), Recognition.is_public.is_(True)]
-    if to_user_id:
-        conditions.append(Recognition.to_user_id == to_user_id)
-    if from_user_id:
-        conditions.append(Recognition.from_user_id == from_user_id)
-    result = await session.execute(
-        select(Recognition)
-        .where(and_(*conditions))
-        .order_by(Recognition.created_at.desc())
-        .limit(min(limit, 200))
-    )
-    recs = result.scalars().all()
-    return {
-        "items": [
-            {
-                "recognition_id": r.recognition_id,
-                "from_user_id": r.from_user_id,
-                "to_user_id": r.to_user_id,
-                "recognition_type": r.recognition_type,
-                "message": r.message,
-                "values_tags": r.values_tags,
-                "points": r.points,
-                "created_at": r.created_at.isoformat() if r.created_at else None,
-            }
-            for r in recs
-        ],
-        "total": len(recs),
-    }
-
-
 @router.get("/recognitions", response_model=Dict[str, Any])
 async def list_recognitions(
     limit: int = 50,

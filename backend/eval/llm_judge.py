@@ -1,11 +1,14 @@
 """
 LLM-as-Judge 评估框架
 
-用 LLM 对评估输出做质量打分（证据引用准确率、语气分离、幻觉率），
-补充现有 Mock Provider 只验流程的不足。
+用 LLM 对评估输出做质量打分（证据引用准确率、语气分离、幻觉率）。
 
 - LLMJudge：接受一个 ChatProvider 实例，调用真实 LLM 对三个维度打分；
 - MockJudge：不调真实 LLM，用规则启发式返回分数，便于离线/CI 验证。
+
+能力边界: run_dataset_with_judge 中被评对象固定由 MockProvider 生成,
+本模块度量的是 judge 自身的打分行为,不构成对真实 LLM 评估质量的端到端评测
+(后者请走 eval/evaluate.py 完整流水线)。
 
 用法：
     # 使用 MockJudge（规则启发式，不调真实 LLM）
@@ -276,7 +279,12 @@ class MockJudge(LLMJudge):
 async def run_dataset_with_judge(
     dataset: list, judge: LLMJudge, tier: str = "L0"
 ) -> List[Dict[str, Any]]:
-    """对整个数据集用 MockProvider 生成评估，再用 judge 打分"""
+    """对整个数据集生成评估,再用 judge 打分。
+
+    能力边界(有意为之): 被评对象固定由 MockProvider 生成(build_mock_model_router),
+    因此本函数衡量的是"judge 对确定性 mock 产出的打分稳定性",不能用于评测真实
+    LLM 的评估质量。需要评测真实模型时,请用 eval/evaluate.py 的完整流水线。
+    """
     router = build_mock_model_router(tier=tier)
     results: List[Dict[str, Any]] = []
     for case in dataset:
