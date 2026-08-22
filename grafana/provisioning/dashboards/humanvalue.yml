@@ -1,5 +1,5 @@
 # Grafana 仪表盘 provisioning：启动时从 grafana/dashboard.json 自动加载 HumanValue 看板。
-# 配合 datasources/prometheus.yml 使用，无需手动 Import。
+# 配合 provisioning/datasources/datasources.yml 使用，无需手动 Import。
 apiVersion: 1
 
 providers:

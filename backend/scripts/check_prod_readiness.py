@@ -42,6 +42,8 @@ DEFAULT_JWT_SECRETS = {
     "secret",
     "jwt-secret-key",
     "changeme",
+    # deploy/k8s/secret.yaml 模板占位值(防止模板原样 apply 到生产绕过本检查)
+    "change-me-to-a-strong-random-secret-min-32-chars",
 }
 
 # 默认演示密码黑名单 (生产环境不允许使用默认值)
@@ -58,6 +60,9 @@ DEFAULT_SECRET_PLACEHOLDERS = {
     "changeme",
     "placeholder",
     "example",
+    # deploy/k8s/secret.yaml 模板占位值
+    "replace_with_base64_encoded_32_byte_key",
+    "replace-with-base64-encoded-32-byte-key",
 }
 
 
